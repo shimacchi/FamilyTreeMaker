@@ -11,10 +11,14 @@ namespace FamilyTreeMaker
     {
         //ラベルコントロールにオリジナル要素としてPersonクラスオブジェクトを格納
         Person person;
-   
+        //マウスドラッグでの移動に関連するプロパティ
+        public Boolean isMoveable;
+        public int pX, pY;
+
         public PersonLabel(Person person)
         {
             this.person = person;
+            this.isMoveable = false;
         }
     }
 }

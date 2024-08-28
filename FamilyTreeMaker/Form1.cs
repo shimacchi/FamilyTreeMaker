@@ -16,7 +16,7 @@ namespace FamilyTreeMaker
         static readonly int MAX_GENERATION = 3;
         static readonly int PADDING = 10;
         static readonly int[] gen_centerY = new int[MAX_GENERATION];
-        static readonly Font genFont = new Font(FontFamily.GenericMonospace, 20, FontStyle.Regular);
+        static readonly Font genFont = new Font(FontFamily.GenericMonospace, 22, FontStyle.Regular);
         static readonly Font textFont = new Font(FontFamily.GenericMonospace, 12, FontStyle.Regular);
         public MainForm()
         {
@@ -67,9 +67,44 @@ namespace FamilyTreeMaker
         private void addButton_Click(object sender, EventArgs e)
         {
             Label pl = new PersonLabel(new Person());
-            pl.Text = "TestLabel";
-            pl.Show();
+            //ラベルコントロールの基本設定
+            pl.Font = genFont;
+            pl.MouseDown += new MouseEventHandler(personLabel_MouseDown);
+            pl.MouseUp += new MouseEventHandler(personLabel_MouseUp);
+            pl.MouseMove += new MouseEventHandler(personLabel_MouseMove);
+            pl.Text = "○";
+            
             mainPictureBox.Controls.Add(pl);
+        }
+
+        private void personLabel_MouseDown(object sender, MouseEventArgs e)
+        {
+            PersonLabel pl = (sender as PersonLabel);
+            //移動可能にする
+            pl.isMoveable = true;
+            pl.Width = 30;
+            pl.Height = 30;
+            pl.pX = e.X;
+            pl.pY = e.Y;
+
+        }
+
+        private void personLabel_MouseUp(object sender, MouseEventArgs e)
+        {
+            //移動不能にする
+            (sender as PersonLabel).isMoveable = false;
+        }
+        private void personLabel_MouseMove(object sender, MouseEventArgs e)
+        {
+            //移動可能なら移動する
+            PersonLabel pl = (sender as PersonLabel);
+            if (pl.isMoveable)
+            {
+                pl.Left = pl.Left + e.X - pl.pX;
+                pl.Top = pl.Top + e.Y - pl.pY;
+
+                mainPictureBox.Refresh();
+            }
         }
     }
 }
