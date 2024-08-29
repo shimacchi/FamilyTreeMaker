@@ -106,5 +106,10 @@ namespace FamilyTreeMaker
                 mainPictureBox.Refresh();
             }
         }
+
+        private void mainPictureBox_Resize(object sender, EventArgs e)
+        {
+            mainPictureBox.Refresh();
+        }
     }
 }
