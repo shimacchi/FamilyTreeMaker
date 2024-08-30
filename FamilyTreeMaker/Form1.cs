@@ -20,20 +20,20 @@ namespace FamilyTreeMaker
 
         static readonly int PADDING = 10;
         //デフォルトの列数
-        static readonly int INITIAL_COLUMN_NUMBER = 20;
+        static readonly int INITIAL_COLUMN_NUMBER = 10;
         //現在の列数
         static int column_number = INITIAL_COLUMN_NUMBER;
 
         //人物を表す記号のフォントサイズ(px) = セルの幅でもある
         static int cellWidth;
         //情報(死亡時年齢や発端者など)のフォントサイズ(pt)
-        static int infoSize = 12;
+        int infoSize = 12;
 
         //世代ごとのPicureBoxのなかでの基準位置
         static readonly int[] gen_centerY = new int[MAX_GENERATION];
 
         //情報表示用の文字フォント
-        static Font textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
+        Font textFont;
         //世代表示の文字用フォント
         static readonly Font numFont = new Font(FontFamily.GenericMonospace, 20, FontStyle.Regular);
 
@@ -67,6 +67,9 @@ namespace FamilyTreeMaker
             {
                 c.Enabled = false;
             }
+
+            infoTextFontSizeNumeric.Value = infoSize;
+            textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -120,8 +123,8 @@ namespace FamilyTreeMaker
         //家系図描画メソッド
         private void drawFamilyGraphics(Graphics g)
         {
-            //パディングは2px
-            int pad = 5;
+            //パディング
+            int pad = cellWidth / 6;
             //図形描画サイズ(幅)
             int ds = calcCellWidth(false) - pad * 2;
 
@@ -145,17 +148,13 @@ namespace FamilyTreeMaker
                                 {
                                     //罹患者ならば塗りつぶし
                                     g.FillRectangle(Brushes.Black, x + pad, y + pad, ds, ds);
-                                } else
+                                }
+                                else
                                 {
                                     //非罹患者ならば□
                                     g.DrawRectangle(Pens.Black, x + pad, y + pad, ds, ds);
                                 }
 
-                                if (p.getIsDead())
-                                {
-                                    //死亡していれば斜め線追加
-                                    g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth(false));
-                                }
                                 break;
 
                             //女性
@@ -170,13 +169,31 @@ namespace FamilyTreeMaker
                                     //非罹患者ならば□
                                     g.DrawEllipse(Pens.Black, x + pad, y + pad, ds, ds);
                                 }
-
-                                if (p.getIsDead())
-                                {
-                                    //死亡していれば斜め線追加
-                                    g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth(false));
-                                }
                                 break;
+                        }
+
+                        if (p.getIsDead())
+                        {
+                            //死亡していれば斜め線追加
+                            g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth(false));
+                            //死亡時年齢が-1でなければ情報表示
+                            if (p.getAgeOfDeath() != -1)
+                            {
+                                g.DrawString(String.Format("d.{0}y", p.getAgeOfDeath()), textFont, Brushes.Black, x + pad / 3, y + cellWidth);
+                            }
+                        }
+
+                        if (p.getIsProband())
+                        {
+                            //発端者ならばP↑追加
+                            g.DrawString("P", textFont, Brushes.Black, x - pad * 3, y + cellWidth + pad);
+                            //↑のポイント作成
+                            int al = pad / 2;
+                            int tx = x - pad / 3;
+                            int ty = y + cellWidth + pad / 3;
+                            g.DrawLine(Pens.Black, x - pad, y + cellWidth + pad, tx, ty);
+                            g.DrawLine(Pens.Black, tx - al, ty, tx, ty);
+                            g.DrawLine(Pens.Black, tx, ty + al, tx, ty);
                         }
                     }
                 }
@@ -363,6 +380,34 @@ namespace FamilyTreeMaker
             mainPictureBox.Refresh();
         }
 
+        private void infoTextFontSizeNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            infoSize = (int)infoTextFontSizeNumeric.Value;
+            textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
+
+            mainPictureBox.Refresh();
+        }
+
+        private void ageOfDeathNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                cell[selectedGen, selectedCol].setAgeOfDeath((int)ageOfDeathNumeric.Value);
+            }
+
+            mainPictureBox.Refresh();
+        }
+
+        private void isProbandCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                cell[selectedGen, selectedCol].setIsProband(isProbandCheck.Checked);
+            }
+
+            mainPictureBox.Refresh();
+        }
+    
         //対象者の情報を表示
         private void showTargetPersonInfo(int gen, int col)
         {

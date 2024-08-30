@@ -56,11 +56,14 @@
             this.label2 = new System.Windows.Forms.Label();
             this.colSizeNumeric = new System.Windows.Forms.NumericUpDown();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.infoTextFontSizeNumeric = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.mainPictureBox)).BeginInit();
             this.contextMenu.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ageOfDeathNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.colSizeNumeric)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.infoTextFontSizeNumeric)).BeginInit();
             this.SuspendLayout();
             // 
             // mainPictureBox
@@ -290,6 +293,7 @@
             this.ageOfDeathNumeric.Name = "ageOfDeathNumeric";
             this.ageOfDeathNumeric.Size = new System.Drawing.Size(82, 22);
             this.ageOfDeathNumeric.TabIndex = 2;
+            this.ageOfDeathNumeric.ValueChanged += new System.EventHandler(this.ageOfDeathNumeric_ValueChanged);
             // 
             // isDeadCheck
             // 
@@ -311,6 +315,7 @@
             this.isProbandCheck.TabIndex = 0;
             this.isProbandCheck.Text = "発端者";
             this.isProbandCheck.UseVisualStyleBackColor = true;
+            this.isProbandCheck.CheckedChanged += new System.EventHandler(this.isProbandCheck_CheckedChanged);
             // 
             // deleteButton
             // 
@@ -363,11 +368,49 @@
             // 
             this.saveFileDialog1.DefaultExt = "bmp";
             // 
+            // infoTextFontSizeNumeric
+            // 
+            this.infoTextFontSizeNumeric.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.infoTextFontSizeNumeric.Location = new System.Drawing.Point(664, 98);
+            this.infoTextFontSizeNumeric.Maximum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.infoTextFontSizeNumeric.Minimum = new decimal(new int[] {
+            6,
+            0,
+            0,
+            0});
+            this.infoTextFontSizeNumeric.Name = "infoTextFontSizeNumeric";
+            this.infoTextFontSizeNumeric.Size = new System.Drawing.Size(85, 22);
+            this.infoTextFontSizeNumeric.TabIndex = 12;
+            this.infoTextFontSizeNumeric.Value = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.infoTextFontSizeNumeric.ValueChanged += new System.EventHandler(this.infoTextFontSizeNumeric_ValueChanged);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(661, 80);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(102, 15);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "情報文字サイズ";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(782, 553);
+            this.Controls.Add(this.infoTextFontSizeNumeric);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.colSizeNumeric);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.deleteButton);
@@ -384,6 +427,7 @@
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ageOfDeathNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.colSizeNumeric)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.infoTextFontSizeNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -418,6 +462,8 @@
         private System.Windows.Forms.Label childNumLabel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
+        private System.Windows.Forms.NumericUpDown infoTextFontSizeNumeric;
+        private System.Windows.Forms.Label label4;
     }
 }
 
