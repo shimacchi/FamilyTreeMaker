@@ -33,8 +33,10 @@
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.オブジェクトの追加AToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.オブジェクトの削除DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             this.婚姻関係を設定MToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.婚姻関係を削除IToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.親子関係を設定ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ImageSaveButton = new System.Windows.Forms.Button();
             this.addButton = new System.Windows.Forms.Button();
@@ -58,6 +60,8 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.infoTextFontSizeNumeric = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.infoLabel = new System.Windows.Forms.Label();
+            this.親子関係を削除EToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.mainPictureBox)).BeginInit();
             this.contextMenu.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -81,6 +85,7 @@
             this.mainPictureBox.Click += new System.EventHandler(this.mainPictureBox_Click);
             this.mainPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.mainPictureBox_Paint);
             this.mainPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseDown);
+            this.mainPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseUp);
             this.mainPictureBox.Resize += new System.EventHandler(this.mainPictureBox_Resize);
             // 
             // contextMenu
@@ -89,11 +94,14 @@
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.オブジェクトの追加AToolStripMenuItem,
             this.オブジェクトの削除DToolStripMenuItem,
-            this.toolStripMenuItem1,
+            this.toolStripMenuItem2,
             this.婚姻関係を設定MToolStripMenuItem,
-            this.親子関係を設定ToolStripMenuItem});
+            this.婚姻関係を削除IToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.親子関係を設定ToolStripMenuItem,
+            this.親子関係を削除EToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(203, 106);
+            this.contextMenu.Size = new System.Drawing.Size(211, 188);
             // 
             // オブジェクトの追加AToolStripMenuItem
             // 
@@ -109,22 +117,36 @@
             this.オブジェクトの削除DToolStripMenuItem.Text = "人物削除(&D)";
             this.オブジェクトの削除DToolStripMenuItem.Click += new System.EventHandler(this.オブジェクトの削除DToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem1
+            // toolStripMenuItem2
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(199, 6);
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(199, 6);
             // 
             // 婚姻関係を設定MToolStripMenuItem
             // 
             this.婚姻関係を設定MToolStripMenuItem.Name = "婚姻関係を設定MToolStripMenuItem";
             this.婚姻関係を設定MToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
             this.婚姻関係を設定MToolStripMenuItem.Text = "婚姻関係を設定(&M)";
+            this.婚姻関係を設定MToolStripMenuItem.Click += new System.EventHandler(this.婚姻関係を設定MToolStripMenuItem_Click);
+            // 
+            // 婚姻関係を削除IToolStripMenuItem
+            // 
+            this.婚姻関係を削除IToolStripMenuItem.Name = "婚姻関係を削除IToolStripMenuItem";
+            this.婚姻関係を削除IToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
+            this.婚姻関係を削除IToolStripMenuItem.Text = "婚姻関係を削除(&I)";
+            this.婚姻関係を削除IToolStripMenuItem.Click += new System.EventHandler(this.婚姻関係を削除IToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(199, 6);
             // 
             // 親子関係を設定ToolStripMenuItem
             // 
             this.親子関係を設定ToolStripMenuItem.Name = "親子関係を設定ToolStripMenuItem";
             this.親子関係を設定ToolStripMenuItem.Size = new System.Drawing.Size(202, 24);
             this.親子関係を設定ToolStripMenuItem.Text = "親子関係を設定(&F)";
+            this.親子関係を設定ToolStripMenuItem.Click += new System.EventHandler(this.親子関係を設定ToolStripMenuItem_Click);
             // 
             // ImageSaveButton
             // 
@@ -199,6 +221,7 @@
             this.isConsanguineousCheck.TabIndex = 10;
             this.isConsanguineousCheck.Text = "近親婚";
             this.isConsanguineousCheck.UseVisualStyleBackColor = true;
+            this.isConsanguineousCheck.CheckedChanged += new System.EventHandler(this.isConsanguineousCheck_CheckedChanged);
             // 
             // isSufferedCheck
             // 
@@ -404,11 +427,30 @@
             this.label4.TabIndex = 13;
             this.label4.Text = "情報文字サイズ";
             // 
+            // infoLabel
+            // 
+            this.infoLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.infoLabel.AutoSize = true;
+            this.infoLabel.Font = new System.Drawing.Font("MS UI Gothic", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.infoLabel.ForeColor = System.Drawing.Color.Red;
+            this.infoLabel.Location = new System.Drawing.Point(559, 443);
+            this.infoLabel.Name = "infoLabel";
+            this.infoLabel.Size = new System.Drawing.Size(0, 18);
+            this.infoLabel.TabIndex = 14;
+            // 
+            // 親子関係を削除EToolStripMenuItem
+            // 
+            this.親子関係を削除EToolStripMenuItem.Name = "親子関係を削除EToolStripMenuItem";
+            this.親子関係を削除EToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.親子関係を削除EToolStripMenuItem.Text = "親子関係を削除(&E)";
+            this.親子関係を削除EToolStripMenuItem.Click += new System.EventHandler(this.親子関係を削除EToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(782, 553);
+            this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.infoTextFontSizeNumeric);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.colSizeNumeric);
@@ -440,7 +482,6 @@
         private System.Windows.Forms.ContextMenuStrip contextMenu;
         private System.Windows.Forms.ToolStripMenuItem オブジェクトの追加AToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem オブジェクトの削除DToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.Button addButton;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button deleteButton;
@@ -464,6 +505,11 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.NumericUpDown infoTextFontSizeNumeric;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem 婚姻関係を削除IToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.Label infoLabel;
+        private System.Windows.Forms.ToolStripMenuItem 親子関係を削除EToolStripMenuItem;
     }
 }
 

@@ -31,7 +31,7 @@ namespace FamilyTreeMaker
         int sex;
 
         //結婚しているか
-        Boolean isMarriged;
+        Boolean isMarried;
         //近親婚か否か
         Boolean isConsanguineous;
 
@@ -43,21 +43,14 @@ namespace FamilyTreeMaker
         //配偶者を表すid
         int spouseID;
 
-
-        public Person(int sex)
-        {
-            //性の情報は最低限必要
-            this.sex = sex;
-            id = ++PresentID;
-            parentID = -1;
-        }
-
         public Person()
         {
             //デフォルトでは男性で
             this.sex = 0;
             id = ++PresentID;
             parentID = -1;
+            isMarried = false;
+            spouseID = -1;
         }
 
         public int getParentID()
@@ -155,6 +148,27 @@ namespace FamilyTreeMaker
         public void setIsConsanguineous(Boolean isConsanguineous)
         {
             this.isConsanguineous = isConsanguineous;
+        }
+
+        public Boolean getIsMarried()
+        {
+            return isMarried;
+        }
+
+        public void setIsMarried(Boolean isMarried, int id)
+        {
+            this.isMarried = isMarried;
+            this.spouseID = id;
+        }
+
+        public int getGeneration()
+        {
+            return generation;
+        }
+
+        public void setGeranation(int generation) 
+        { 
+            this.generation = generation; 
         }
     }
 }
