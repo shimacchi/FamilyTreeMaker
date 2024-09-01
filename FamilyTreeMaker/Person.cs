@@ -20,8 +20,8 @@ namespace FamilyTreeMaker
         string name;
         //死亡しているか否か
         Boolean isDead;
-        //死亡時年齢
-        int ageOfDeath;
+        //年齢
+        int age;
         //発端者か否か
         Boolean isProband;
         //罹患者か否か
@@ -43,14 +43,29 @@ namespace FamilyTreeMaker
         //配偶者を表すid
         int spouseID;
 
-        public Person()
+        private void commonInitialize()
         {
-            //デフォルトでは男性で
-            this.sex = 0;
             id = ++PresentID;
             parentID = -1;
             isMarried = false;
+            isConsanguineous = false;
+            isProband = false;
+            isDead = false;
             spouseID = -1;
+            age = -1;
+        }
+        public Person()
+        {
+            //デフォルトでは男性で
+            commonInitialize();
+            this.sex = 0;
+        }
+
+        //性別を指定したコンストラクタ
+        public Person(int sex)
+        {
+            commonInitialize();
+            this.sex = sex;
         }
 
         public int getParentID()
@@ -110,14 +125,14 @@ namespace FamilyTreeMaker
             this.name = name;
         }
 
-        public int getAgeOfDeath()
+        public int getAge()
         {
-            return ageOfDeath;
+            return age;
         }
 
-        public void setAgeOfDeath(int age)
+        public void setAge(int age)
         {
-            this.ageOfDeath = age;
+            this.age = age;
         }
 
         public Boolean getIsProband()

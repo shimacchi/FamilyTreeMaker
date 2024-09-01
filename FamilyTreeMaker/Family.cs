@@ -43,13 +43,19 @@ namespace FamilyTreeMaker
         }
 
         //対象人物の子供の数を返す
-        public int GetChildNum(int  id)
+        public int GetChildNum(int id)
         {
             int ret = 0;
+            //配偶者のid
+            int sid = GetFromId(id).getSpouseID();
+            if (sid == -1)
+            {
+                sid = -2;
+            }
 
             foreach (Person person in list)
             {
-                if (person.getParentID() == id) ret++;
+                if (person.getParentID() == id || person.getParentID() == sid) ret++;
             }
 
             return ret;

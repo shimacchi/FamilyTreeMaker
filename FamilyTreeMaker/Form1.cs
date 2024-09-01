@@ -19,7 +19,7 @@ namespace FamilyTreeMaker
         //列の最大数
         static readonly int MAX_COLUMN_NUMBER = 30;
 
-        static readonly int PADDING = 10;
+        static readonly int PADDING = 20;
         static int padding_famliytree;
 
         //デフォルトの列数
@@ -69,7 +69,7 @@ namespace FamilyTreeMaker
         private void MainForm_Load(object sender, EventArgs e)
         {
             colSizeNumeric.Value  = column_number;
-            cellWidth = calcCellWidth(false);
+            cellWidth = calcCellWidth();
 
             selectedCol = -1;
             selectedGen = -1;
@@ -78,6 +78,7 @@ namespace FamilyTreeMaker
 
             family = new Family();
             actionMode = ActionMode.Normal;
+            infoLabel.Text = "";
 
             //グループボック内のオブジェクトを使用可不能に
             foreach (Control c in groupBox1.Controls)
@@ -93,7 +94,7 @@ namespace FamilyTreeMaker
         {
             //家系図をファイルに保存
             //新しいイメージボックスにバックグラウンドで家系図作成
-            Image image = new Bitmap(mainPictureBox.Width, mainPictureBox.Height);
+            Image image = new Bitmap(mainPictureBox.ClientRectangle.Width, mainPictureBox.ClientRectangle.Height);
             Graphics g = Graphics.FromImage(image);
             g.FillRectangle(Brushes.White, 0, 0, image.Width, image.Height);  
 
@@ -103,8 +104,6 @@ namespace FamilyTreeMaker
             {
                 image.Save(saveFileDialog1.FileName);
             }
-
-
         }
 
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
@@ -113,7 +112,7 @@ namespace FamilyTreeMaker
             //世代別の基準となるY座標を計算
             setGenerationCenterY(e.ClipRectangle.Height);
             //セル幅計算
-            int c_width = calcCellWidth(false);
+            int c_width = calcCellWidth();
 
             //世代など表示
             for (int gen = 0; gen < MAX_GENERATION; gen++)
@@ -137,138 +136,6 @@ namespace FamilyTreeMaker
             drawFamilyGraphics(g);
         }
 
-        //家系図描画メソッド
-        private void drawFamilyGraphics(Graphics g)
-        {
-            //パディング
-            padding_famliytree = cellWidth / 6;
-            //図形描画サイズ(幅)
-            int ds = calcCellWidth(false) - padding_famliytree * 2;
-
-            for (int gen = 0; gen < MAX_GENERATION; gen++)
-            {
-                for (int col = 0; col < column_number; col++)
-                {
-                    Person p = cell[gen, col];
-                    if (p != null)
-                    {
-                        //人物がいれば描画
-                        int x = getTargetPoint(gen, col).X;
-                        int y = getTargetPoint(gen, col).Y;
-                        int xx = getTargetPoint(gen, col + 1).X;
-
-                        switch (p.getSex())
-                        {
-                            //男性
-                            case 0:
-                                if (p.getIsSuffered())
-                                {
-                                    //罹患者ならば塗りつぶし
-                                    g.FillRectangle(Brushes.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
-                                }
-                                else
-                                {
-                                    //非罹患者ならば□
-                                    g.DrawRectangle(Pens.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
-                                }
-
-                                break;
-
-                            //女性
-                            case 1:
-                                if (p.getIsSuffered())
-                                {
-                                    //罹患者ならば塗りつぶし
-                                    g.FillEllipse(Brushes.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
-                                }
-                                else
-                                {
-                                    //非罹患者ならば□
-                                    g.DrawEllipse(Pens.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
-                                }
-                                break;
-
-                            //性別判別不能: ◇
-                            case 2:
-                                //◇描画のための基準点を計算
-                                int x1 = x + cellWidth / 2;
-                                int y1 = y + cellWidth / 2;
-
-                                Point[] points = new Point[5];
-                                points[0] = new Point(x1, y + padding_famliytree);
-                                points[1] = new Point(x + padding_famliytree, y1);
-                                points[2] = new Point(x1, y + cellWidth - padding_famliytree);
-                                points[3] = new Point(xx - padding_famliytree, y1);
-                                points[4] = points[0];
-
-                                if (p.getIsSuffered())
-                                {
-                                    g.FillPolygon(Brushes.Black, points);
-                                }
-                                else
-                                {
-                                    //非罹患ならば普通に◇
-                                    g.DrawLines(Pens.Black, points);
-                                }
-                                break;
-                               
-                        }
-
-                        if (p.getIsDead())
-                        {
-                            //死亡していれば斜め線追加
-                            g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth(false));
-                            //死亡時年齢が-1でなければ情報表示
-                            if (p.getAgeOfDeath() != -1)
-                            {
-                                g.DrawString(String.Format("d.{0}y", p.getAgeOfDeath()), textFont, Brushes.Black, x + padding_famliytree / 3, y + cellWidth);
-                            }
-                        }
-
-                        if (p.getIsProband())
-                        {
-                            //発端者ならばP↑追加
-                            g.DrawString("P", textFont, Brushes.Black, x - padding_famliytree * 3, y + cellWidth + padding_famliytree);
-                            //↑のポイント作成
-                            int al = padding_famliytree / 2;
-                            int tx = x - padding_famliytree / 3;
-                            int ty = y + cellWidth + padding_famliytree / 3;
-                            g.DrawLine(Pens.Black, x - padding_famliytree, y + cellWidth + padding_famliytree, tx, ty);
-                            g.DrawLine(Pens.Black, tx - al, ty, tx, ty);
-                            g.DrawLine(Pens.Black, tx, ty + al, tx, ty);
-                        }
-
-                        //婚姻関係あれば関係線を描画
-                        if (p.getIsMarried()) 
-                        {
-                            //結婚相手
-                            Person tp = family.GetFromId(p.getSpouseID());
-
-                            //近親婚かどうか
-                            if (p.getIsConsanguineous())
-                            {
-                                //近親婚だったので二重線
-                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, false));
-                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, true));
-
-                            }
-                            else
-                            {
-                                //近親婚ではないので通常の線
-                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, false));
-                            }
-                        }
-
-                        //親子関係があれば関係線を描画
-                        if (p.getParentID() != -1)
-                        {
-                            g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, family.GetFromId(p.getParentID()), false, true, false));
-                        }
-                    }
-                }
-            }
-        }
-
         private void mainPictureBox_Click(object sender, EventArgs e)
         {
 
@@ -284,36 +151,12 @@ namespace FamilyTreeMaker
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            //選択していなければ通知
-            if (selectedGen < 0 || selectedCol < 0)
-            {
-                MessageBox.Show("対象セルを選んでください", "エラー", MessageBoxButtons.OK);
-                return;
-            }
-                
-            //選択セルに人物がいなければ追加
-            if (cell[selectedGen, selectedCol] == null)
-            {
-                //対象セルに人はいない
-                Person p = new Person();
-                p.setGeranation(selectedGen);
 
-                cell[selectedGen, selectedCol] = p;
-                family.Add(p);
-   
-                showTargetPersonInfo(selectedGen, selectedCol);
-
-                mainPictureBox.Refresh();
-            } 
-            else
-            {
-                MessageBox.Show("対象セルには既に人がいます", "エラー", MessageBoxButtons.OK);
-            }
         }
 
          private void mainPictureBox_Resize(object sender, EventArgs e)
         {
-            cellWidth = calcCellWidth(false);
+            cellWidth = calcCellWidth();
             mainPictureBox.Refresh();
         }
 
@@ -321,46 +164,41 @@ namespace FamilyTreeMaker
         {
             //表示サイズの変更
             column_number = (int)colSizeNumeric.Value;
-            cellWidth = calcCellWidth(false);
+            cellWidth = calcCellWidth();
 
             //表示リフレッシュ
             mainPictureBox.Refresh();
         }
 
         //セル幅の計算メソッド
-        private int calcCellWidth(Boolean isPt)
+        private int calcCellWidth()
         {
-            float factor;
-            if (isPt)
-            {
-                factor = 1.33f;
-            }
-            else
-            {
-                factor = 1.0f;
-            }
-
-            return (int)((float)(mainPictureBox.Width - PADDING * 3) / factor / column_number);
+            return (int)((float)(mainPictureBox.ClientRectangle.Width - PADDING * 3) / column_number);
         }
 
         private void オブジェクトの削除DToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //ボタンの機能と同等
-            deleteButton_Click(sender, e);
-        }
-
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
             //人物の削除
+            Person p = cell[selectedGen, selectedCol];
+
             //選択セルに人物がいなければ追加
-            if (cell[selectedGen, selectedCol] == null)
+            if (p == null)
             {
                 //対象セルに人はいないのでエラー
                 MessageBox.Show("対象セルには人がいません", "エラー", MessageBoxButtons.OK);
                 return;
+
             }
             else
             {
+                //婚姻関係あるいは親子関係がある場合には削除不可
+                if (family.GetChildNum(p.getId()) > 0 || p.getSpouseID() != -1)
+                {
+                    MessageBox.Show("婚姻関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK);
+                    return;
+
+                }
+
                 //削除を確認した上でエラー
                 DialogResult res = MessageBox.Show("削除してよいですか？", "確認", MessageBoxButtons.YesNo);
                 if (res == DialogResult.Yes)
@@ -373,10 +211,29 @@ namespace FamilyTreeMaker
             }
         }
 
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
         private void オブジェクトの追加AToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //追加ボタンと動作は同じ
-            addButton_Click(sender, e);
+            addPerson();
+        }
+
+        private void 男性を追加FToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addPerson(0);
+        }
+
+        private void 女性を追加FToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addPerson(1);
+        }
+
+        private void 性別不明を追加UToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            addPerson(2);
         }
 
         private void mainPictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -407,24 +264,31 @@ namespace FamilyTreeMaker
 
                 if (actionMode == ActionMode.SetMartial)
                 {
+                    bool isError = false;
+
                     //動作モードが婚姻関係設定
                     //対象のセルが空 = ノーマルモードに戻す
                     if (cell[selectedGen, selectedCol] != null)
                     {
+                        Person p = cell[orgSelectedGen, orgSelectedCol];
                         Person tp = cell[selectedGen, selectedCol];
                         if (orgSelectedGen != selectedGen)
                         {
                             //対象のセルが世代違い
                             MessageBox.Show("世代が異なる人物間で婚姻関係は設定できません", "エラー", MessageBoxButtons.OK);
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
+                            isError = true;   
                         }
                         else if (tp.getIsMarried())
                         {
                             //既に婚姻関係が存在している人物 = エラー
                             MessageBox.Show("既に婚姻関係が設定されています", "エラー", MessageBoxButtons.OK);
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
+                            isError = true;
+                        }
+                        else if ((p.getSex() == 1 && tp.getSex() == 1) || (p.getSex() == 0 && tp.getSex() == 0))
+                        {
+                            //どちらかが性別判別不能ではなく男性同士あるいは女性同士であれば婚姻関係は設定できない
+                            MessageBox.Show("男性同士あるいは女性同士になっています", "エラー", MessageBoxButtons.OK);
+                            isError = true;
                         }
                         else
                         {
@@ -437,11 +301,23 @@ namespace FamilyTreeMaker
                             cell[selectedGen, selectedCol].setIsMarried(true, id);
                             cell[orgSelectedGen, orgSelectedCol].setIsMarried(true, tid);
                         }
+                        
+                        if (isError)
+                        {
+                            //エラーの場合は共通のエラー処理
+                            selectedGen = orgSelectedGen;
+                            selectedCol = orgSelectedCol;
+                            //動作モードをノーマルに戻す
+                            actionMode = ActionMode.Normal;
+                            infoLabel.Text = "";
+                        }
                     }
                 }
 
                 if (actionMode == ActionMode.SetFiliation)
                 {
+                    bool isError = false;
+
                     //親子関係設定
                     //対象のセルが空 = ノーマルモードに戻す
                     if (cell[selectedGen, selectedCol] != null)
@@ -463,22 +339,30 @@ namespace FamilyTreeMaker
                         if (Math.Abs(orgSelectedGen - selectedGen) > 1 || orgSelectedGen == selectedGen)
                         {
                             //世代が1世代の差で無いとエラ
-                            MessageBox.Show("2世代以上あるいは同世代とは親子関係を設定できません", "エラー", MessageBoxButtons.OK);
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
+                            MessageBox.Show("2世代以上離れているか同世代の人物とは親子関係を設定できません", "エラー", MessageBoxButtons.OK);
+                            isError = true;
                         }
                         else if (!parent.getIsMarried())
                         {
                             //親に配偶者がいない場合 = エラー
                             MessageBox.Show("親世代に配偶者がいません", "エラー", MessageBoxButtons.OK);
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
+                            isError = true;
                         }
                         else
                         {
                             //条件が整ったので親子関係を設定
                             //親のIDを設定
                             child.setParentID(parent.getId());
+                        }
+
+                        if (isError)
+                        {
+                            //エラーの場合は共通のエラー処理
+                            selectedGen = orgSelectedGen;
+                            selectedCol = orgSelectedCol;
+                            //動作モードをノーマルに戻す
+                            actionMode = ActionMode.Normal;
+                            infoLabel.Text = "";
                         }
                     }
                 }
@@ -495,13 +379,12 @@ namespace FamilyTreeMaker
             {
                 cell[selectedGen, selectedCol].setName(nameText.Text);
             }
-
         }
 
         private void isDeadCheck_CheckedChanged(object sender, EventArgs e)
         {
             //死亡チェックがあれば下の表示は有効
-            ageOfDeathNumeric.Enabled = isDeadCheck.Checked;
+            ageNumeric.Enabled = isDeadCheck.Checked;
 
             //対象がnullでなければ情報更新
             if (cell[selectedGen, selectedCol] != null)
@@ -562,36 +445,36 @@ namespace FamilyTreeMaker
 
                 if (e.Button == MouseButtons.Left && (selectedCol != orgSelectedCol || selectedGen != orgSelectedGen))
                 {
+                    if (cell[orgSelectedGen, orgSelectedCol] == null)
+                    {
+                        return;
+                    }
+
                     //世代が異なっていたら移動しない
                     if (selectedGen != orgSelectedGen)
                     {
                         MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
                         selectedCol = orgSelectedCol;
-                        selectedGen = orgSelectedGen;
-
-                        return;
-                    }
-
-                    if (cell[selectedGen, selectedCol] != null)
+                        selectedGen = orgSelectedGen;                    } 
+                    else if (cell[selectedGen, selectedCol] != null)
                     {
                         //空いていなければ移動しない
                         MessageBox.Show("移動対象セルが空ではありません", "エラー", MessageBoxButtons.OK);
                         selectedCol = orgSelectedCol;
                         selectedGen = orgSelectedGen;
-
-                        return;
+                    } 
+                    else
+                    {
+                        //条件が整っているので移動処理
+                        cell[selectedGen, selectedCol] = cell[orgSelectedGen, orgSelectedCol];
+                        cell[orgSelectedGen, orgSelectedCol] = null;
+                        mainPictureBox.Refresh();
                     }
-
-                    //条件が整っているので移動処理
-                    cell[selectedGen, selectedCol] = cell[orgSelectedGen, orgSelectedCol];
-                    cell[orgSelectedGen, orgSelectedCol] = null;
-                    mainPictureBox.Refresh();
                 }
             }
-
-            if (actionMode == ActionMode.SetMartial　|| actionMode == ActionMode.SetFiliation)
+            else if (actionMode == ActionMode.SetMartial || actionMode == ActionMode.SetFiliation)
             {
-                //婚姻関係設定モードでボタン放された場合、ノーマルモードに戻す
+                //動作モードをノーマルに戻す
                 actionMode = ActionMode.Normal;
                 infoLabel.Text = "";
             }
@@ -602,35 +485,32 @@ namespace FamilyTreeMaker
             //婚姻関係設定モード
 
             //もし選択しているセルが空だったらメッセージ表示して何もしない
-            if (cell[selectedGen, selectedCol] == null) 
+            if (cell[selectedGen, selectedCol] == null)
             {
                 MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK);
-                selectedCol = orgSelectedCol;
-                selectedGen = orgSelectedGen;
                 return;
             }
-
-            if(cell[selectedGen, selectedCol].getIsMarried())
+            else if (cell[selectedGen, selectedCol].getIsMarried())
             {
                 //既に婚姻関係が存在している人物 = エラー
                 MessageBox.Show("既に婚姻関係が設定されています", "エラー", MessageBoxButtons.OK);
-                selectedCol = orgSelectedCol;
-                selectedGen = orgSelectedGen;
                 return;
             }
-            
-            actionMode = ActionMode.SetMartial;
-            //現在選択セルの人物を保存
-            orgSelectedGen = selectedGen;
-            orgSelectedCol = selectedCol;
-            infoLabel.Text = "婚姻関係を設定中・・・";
+            else
+            {
+                //現在選択セルの人物を保存
+                actionMode = ActionMode.SetMartial;
+                orgSelectedGen = selectedGen;
+                orgSelectedCol = selectedCol;
+                infoLabel.Text = "婚姻関係を設定中・・・";
+            }
         }
 
         private void ageOfDeathNumeric_ValueChanged(object sender, EventArgs e)
         {
             if (cell[selectedGen, selectedCol] != null)
             {
-                cell[selectedGen, selectedCol].setAgeOfDeath((int)ageOfDeathNumeric.Value);
+                cell[selectedGen, selectedCol].setAge((int)ageNumeric.Value);
             }
 
             mainPictureBox.Refresh();
@@ -655,22 +535,30 @@ namespace FamilyTreeMaker
 
         private void 婚姻関係を削除IToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Person p = cell[selectedGen, selectedCol];
+
             //もし選択しているセルが空だったらメッセージ表示して何もしない
-            if (cell[selectedGen, selectedCol] == null)
+            if (p == null)
             {
                 MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK);
                 return;
             }
 
-            if (!cell[selectedGen, selectedCol].getIsMarried())
+            if (!p.getIsMarried())
             {
                 //婚姻関係がなければエラー
                 MessageBox.Show("婚姻関係が設定されていません", "エラー", MessageBoxButtons.OK);
                 return;
             }
 
+            //子供がいる場合には削除不可
+            if (family.GetChildNum(p.getId()) > 0)
+            {
+                MessageBox.Show("婚姻関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK);
+                return;
+            }
+
             //婚姻関係を削除
-            Person p = cell[selectedGen, selectedCol];
             Person tp = family.GetFromId(p.getSpouseID());
             p.setIsMarried(false, -1);
             tp.setIsMarried(false, -1);
@@ -688,69 +576,6 @@ namespace FamilyTreeMaker
             mainPictureBox.Refresh();
         }
     
-        //対象者の情報を表示
-        private void showTargetPersonInfo(int gen, int col)
-        {
-            Person p = cell[gen, col];
-            if (p == null)
-            {
-                //情報を初期化
-                nameText.Text = "";
-                childNumLabel.Text = "0";
-                isDeadCheck.Checked = false;
-                ageOfDeathNumeric.Enabled = isDeadCheck.Checked;
-                ageOfDeathNumeric.Value = 0;
-                isProbandCheck.Checked = false;
-                isSufferedCheck.Checked = false;
-                isConsanguineousCheck.Checked = false;
-                maleRadio.Checked = false;
-                femaleRadio.Checked = false;
-                unknownRadio.Checked = false;
-
-                //さらにグループボック内のオブジェクトを使用不能に
-                foreach (Control c in groupBox1.Controls)
-                {
-                    c.Enabled = false;
-                }
-
-                return;
-            }
-
-            nameText.Text = p.getName();
-            switch (p.getSex())
-            {
-                case 0:
-                    //男性
-                    maleRadio.Checked = true;
-                    break;
-                case 1:
-                    //女性
-                    femaleRadio.Checked = true; 
-                    break;
-                case 2:
-                    //判別不能
-                    unknownRadio.Checked = true;
-                    break;
-                default:
-                    break;
-            }
-
-            nameText.Text = p.getName();
-            childNumLabel.Text = family.GetChildNum(p.getId()).ToString();
-            isDeadCheck.Checked = p.getIsDead();
-            ageOfDeathNumeric.Enabled = isDeadCheck.Checked;
-            ageOfDeathNumeric.Value = p.getAgeOfDeath();
-            isProbandCheck.Checked = p.getIsProband();
-            isSufferedCheck.Checked = p.getIsSuffered();
-            isConsanguineousCheck.Checked = p.getIsConsanguineous();
-
-            //さらにグループボック内のオブジェクトを使用可能に
-            foreach (Control c in groupBox1.Controls)
-            {
-                c.Enabled = true;
-            }
-        }
-
         private void isConsanguineousCheck_CheckedChanged(object sender, EventArgs e)
         {
             //近親婚の有無
@@ -775,7 +600,7 @@ namespace FamilyTreeMaker
 
         private Point getTargetPoint(int gen, int col)
         {
-            int width = calcCellWidth(false);
+            int width = calcCellWidth();
             return new Point(PADDING * 2 + width * col, gen_centerY[gen] - width / 2);
         }
 
@@ -873,6 +698,243 @@ namespace FamilyTreeMaker
             }
 
             return ret;
+        }
+
+        private void 保存SToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //保存ボタンと動作は同じ
+            button1_Click(sender, e);
+        }
+
+        private void addPerson(int sex = 0)
+        {
+            //選択していなければ通知
+            if (selectedGen < 0 || selectedCol < 0)
+            {
+                MessageBox.Show("対象セルを選んでください", "エラー", MessageBoxButtons.OK);
+                return;
+            }
+
+            //選択セルに人物がいなければ追加
+            if (cell[selectedGen, selectedCol] == null)
+            {
+                //対象セルに人はいない
+                Person p = new Person(sex);
+                p.setGeranation(selectedGen);
+
+                cell[selectedGen, selectedCol] = p;
+                family.Add(p);
+
+                showTargetPersonInfo(selectedGen, selectedCol);
+
+                mainPictureBox.Refresh();
+            }
+            else
+            {
+                MessageBox.Show("対象セルには既に人がいます", "エラー", MessageBoxButtons.OK);
+            }
+        }
+
+
+
+        //対象者の情報を表示
+        private void showTargetPersonInfo(int gen, int col)
+        {
+            Person p = cell[gen, col];
+            if (p == null)
+            {
+                //情報を初期化
+                nameText.Text = "";
+                isDeadCheck.Checked = false;
+                ageNumeric.Enabled = isDeadCheck.Checked;
+                ageNumeric.Value = 0;
+                isProbandCheck.Checked = false;
+                isSufferedCheck.Checked = false;
+                isConsanguineousCheck.Checked = false;
+                maleRadio.Checked = false;
+                femaleRadio.Checked = false;
+                unknownRadio.Checked = false;
+
+                //さらにグループボック内のオブジェクトを使用不能に
+                foreach (Control c in groupBox1.Controls)
+                {
+                    c.Enabled = false;
+                }
+
+                return;
+            }
+
+            nameText.Text = p.getName();
+            switch (p.getSex())
+            {
+                case 0:
+                    //男性
+                    maleRadio.Checked = true;
+                    break;
+                case 1:
+                    //女性
+                    femaleRadio.Checked = true;
+                    break;
+                case 2:
+                    //判別不能
+                    unknownRadio.Checked = true;
+                    break;
+                default:
+                    break;
+            }
+
+            nameText.Text = p.getName();
+            isDeadCheck.Checked = p.getIsDead();
+            ageNumeric.Enabled = isDeadCheck.Checked;
+            ageNumeric.Value = p.getAge();
+            isProbandCheck.Checked = p.getIsProband();
+            isSufferedCheck.Checked = p.getIsSuffered();
+            isConsanguineousCheck.Checked = p.getIsConsanguineous();
+
+            //さらにグループボック内のオブジェクトを使用可能に
+            foreach (Control c in groupBox1.Controls)
+            {
+                c.Enabled = true;
+            }
+        }
+
+        //家系図描画メソッド
+        private void drawFamilyGraphics(Graphics g)
+        {
+            //パディング
+            padding_famliytree = cellWidth / 6;
+            //図形描画サイズ(幅)
+            int ds = calcCellWidth() - padding_famliytree * 2;
+
+            for (int gen = 0; gen < MAX_GENERATION; gen++)
+            {
+                for (int col = 0; col < column_number; col++)
+                {
+                    Person p = cell[gen, col];
+                    if (p != null)
+                    {
+                        //人物がいれば描画
+                        int x = getTargetPoint(gen, col).X;
+                        int y = getTargetPoint(gen, col).Y;
+                        int xx = getTargetPoint(gen, col + 1).X;
+
+                        switch (p.getSex())
+                        {
+                            //男性
+                            case 0:
+                                if (p.getIsSuffered())
+                                {
+                                    //罹患者ならば塗りつぶし
+                                    g.FillRectangle(Brushes.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
+                                }
+                                else
+                                {
+                                    //非罹患者ならば□
+                                    g.DrawRectangle(Pens.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
+                                }
+
+                                break;
+
+                            //女性
+                            case 1:
+                                if (p.getIsSuffered())
+                                {
+                                    //罹患者ならば塗りつぶし
+                                    g.FillEllipse(Brushes.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
+                                }
+                                else
+                                {
+                                    //非罹患者ならば□
+                                    g.DrawEllipse(Pens.Black, x + padding_famliytree, y + padding_famliytree, ds, ds);
+                                }
+                                break;
+
+                            //性別判別不能: ◇
+                            case 2:
+                                //◇描画のための基準点を計算
+                                int x1 = x + cellWidth / 2;
+                                int y1 = y + cellWidth / 2;
+
+                                Point[] points = new Point[5];
+                                points[0] = new Point(x1, y + padding_famliytree);
+                                points[1] = new Point(x + padding_famliytree, y1);
+                                points[2] = new Point(x1, y + cellWidth - padding_famliytree);
+                                points[3] = new Point(xx - padding_famliytree, y1);
+                                points[4] = points[0];
+
+                                if (p.getIsSuffered())
+                                {
+                                    g.FillPolygon(Brushes.Black, points);
+                                }
+                                else
+                                {
+                                    //非罹患ならば普通に◇
+                                    g.DrawLines(Pens.Black, points);
+                                }
+                                break;
+                        }
+
+                        if (p.getIsDead())
+                        {
+                            //死亡していれば斜め線追加
+                            g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth());
+                        }
+
+                        //年齢表示
+                        if (p.getAge() != -1)
+                        {
+                            if (p.getIsDead())
+                            {
+                                g.DrawString(String.Format("d.{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree / 3, y + cellWidth);
+                            }
+                            else
+                            {
+                                g.DrawString(String.Format("{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree / 2, y + cellWidth);
+                            }
+                        }
+
+                        if (p.getIsProband())
+                        {
+                            //発端者ならばP↑追加
+                            g.DrawString("P", textFont, Brushes.Black, x - padding_famliytree * 3, y + cellWidth + padding_famliytree);
+                            //↑のポイント作成
+                            int al = padding_famliytree / 2;
+                            int tx = x - padding_famliytree / 3;
+                            int ty = y + cellWidth + padding_famliytree / 3;
+                            g.DrawLine(Pens.Black, x - padding_famliytree, y + cellWidth + padding_famliytree, tx, ty);
+                            g.DrawLine(Pens.Black, tx - al, ty, tx, ty);
+                            g.DrawLine(Pens.Black, tx, ty + al, tx, ty);
+                        }
+
+                        //婚姻関係あれば関係線を描画
+                        if (p.getIsMarried())
+                        {
+                            //結婚相手
+                            Person tp = family.GetFromId(p.getSpouseID());
+
+                            //近親婚かどうか
+                            if (p.getIsConsanguineous())
+                            {
+                                //近親婚だったので二重線
+                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, false));
+                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, true));
+
+                            }
+                            else
+                            {
+                                //近親婚ではないので通常の線
+                                g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, tp, true, false, false));
+                            }
+                        }
+
+                        //親子関係があれば関係線を描画
+                        if (p.getParentID() != -1)
+                        {
+                            g.DrawLines(Pens.Black, calcLinePointOfRelatedPersons(p, family.GetFromId(p.getParentID()), false, true, false));
+                        }
+                    }
+                }
+            }
         }
     }
 }
