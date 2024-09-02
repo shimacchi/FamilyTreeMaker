@@ -64,6 +64,7 @@ namespace FamilyTreeMaker
         public MainForm()
         {
             InitializeComponent();
+            KeyPreview = true;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -71,10 +72,10 @@ namespace FamilyTreeMaker
             colSizeNumeric.Value  = column_number;
             cellWidth = calcCellWidth();
 
-            selectedCol = -1;
-            selectedGen = -1;
-            orgSelectedCol = -1;
-            orgSelectedGen = -1;
+            selectedCol = 0;
+            selectedGen = 0;
+            orgSelectedCol = 0;
+            orgSelectedGen = 0;
 
             family = new Family();
             actionMode = ActionMode.Normal;
@@ -149,11 +150,6 @@ namespace FamilyTreeMaker
             }
         }
 
-        private void addButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
          private void mainPictureBox_Resize(object sender, EventArgs e)
         {
             cellWidth = calcCellWidth();
@@ -194,7 +190,7 @@ namespace FamilyTreeMaker
                 //婚姻関係あるいは親子関係がある場合には削除不可
                 if (family.GetChildNum(p.getId()) > 0 || p.getSpouseID() != -1)
                 {
-                    MessageBox.Show("婚姻関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("配偶者関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK);
                     return;
 
                 }
@@ -209,11 +205,6 @@ namespace FamilyTreeMaker
                     mainPictureBox.Refresh();
                 }
             }
-        }
-
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void オブジェクトの追加AToolStripMenuItem_Click(object sender, EventArgs e)
@@ -249,6 +240,14 @@ namespace FamilyTreeMaker
                 selectedCol = column_number - 1;
             }
 
+            if (e.Button == MouseButtons.Right)
+            {
+                orgSelectedGen = selectedGen;
+                orgSelectedCol = selectedCol;
+                //対象者の情報を表示
+                showTargetPersonInfo(selectedGen, selectedCol);
+            }
+
             if (e.Button == MouseButtons.Left)
             {
                 //対象者の情報を表示
@@ -264,107 +263,14 @@ namespace FamilyTreeMaker
 
                 if (actionMode == ActionMode.SetMartial)
                 {
-                    bool isError = false;
-
-                    //動作モードが婚姻関係設定
-                    //対象のセルが空 = ノーマルモードに戻す
-                    if (cell[selectedGen, selectedCol] != null)
-                    {
-                        Person p = cell[orgSelectedGen, orgSelectedCol];
-                        Person tp = cell[selectedGen, selectedCol];
-                        if (orgSelectedGen != selectedGen)
-                        {
-                            //対象のセルが世代違い
-                            MessageBox.Show("世代が異なる人物間で婚姻関係は設定できません", "エラー", MessageBoxButtons.OK);
-                            isError = true;   
-                        }
-                        else if (tp.getIsMarried())
-                        {
-                            //既に婚姻関係が存在している人物 = エラー
-                            MessageBox.Show("既に婚姻関係が設定されています", "エラー", MessageBoxButtons.OK);
-                            isError = true;
-                        }
-                        else if ((p.getSex() == 1 && tp.getSex() == 1) || (p.getSex() == 0 && tp.getSex() == 0))
-                        {
-                            //どちらかが性別判別不能ではなく男性同士あるいは女性同士であれば婚姻関係は設定できない
-                            MessageBox.Show("男性同士あるいは女性同士になっています", "エラー", MessageBoxButtons.OK);
-                            isError = true;
-                        }
-                        else
-                        {
-                            //条件が整ったので婚姻関係を設定
-                            //自分と婚姻関係相手のID
-                            int tid = cell[selectedGen, selectedCol].getId();
-                            int id = cell[orgSelectedGen, orgSelectedCol].getId();
-
-                            //婚姻関係を設定(双方向にidを設定し、isMarriedをtrueに
-                            cell[selectedGen, selectedCol].setIsMarried(true, id);
-                            cell[orgSelectedGen, orgSelectedCol].setIsMarried(true, tid);
-                        }
-                        
-                        if (isError)
-                        {
-                            //エラーの場合は共通のエラー処理
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
-                            //動作モードをノーマルに戻す
-                            actionMode = ActionMode.Normal;
-                            infoLabel.Text = "";
-                        }
-                    }
+                    //動作モードが配偶者関係設定
+                    createSpouse();
                 }
 
                 if (actionMode == ActionMode.SetFiliation)
                 {
-                    bool isError = false;
-
-                    //親子関係設定
-                    //対象のセルが空 = ノーマルモードに戻す
-                    if (cell[selectedGen, selectedCol] != null)
-                    {
-                        Person child, parent;
-                        if (selectedGen > orgSelectedGen)
-                        {
-                            //親側が先に選ばれて、子側が次に選ばれた場合
-                            child = cell[selectedGen, selectedCol];
-                            parent = cell[orgSelectedGen, orgSelectedCol];
-                        }
-                        else
-                        {
-                            //子側が先に選ばれて、親側が次に選ばれた
-                            child = cell[orgSelectedGen, orgSelectedCol];
-                            parent = cell[selectedGen, selectedCol];
-                        }
-
-                        if (Math.Abs(orgSelectedGen - selectedGen) > 1 || orgSelectedGen == selectedGen)
-                        {
-                            //世代が1世代の差で無いとエラ
-                            MessageBox.Show("2世代以上離れているか同世代の人物とは親子関係を設定できません", "エラー", MessageBoxButtons.OK);
-                            isError = true;
-                        }
-                        else if (!parent.getIsMarried())
-                        {
-                            //親に配偶者がいない場合 = エラー
-                            MessageBox.Show("親世代に配偶者がいません", "エラー", MessageBoxButtons.OK);
-                            isError = true;
-                        }
-                        else
-                        {
-                            //条件が整ったので親子関係を設定
-                            //親のIDを設定
-                            child.setParentID(parent.getId());
-                        }
-
-                        if (isError)
-                        {
-                            //エラーの場合は共通のエラー処理
-                            selectedGen = orgSelectedGen;
-                            selectedCol = orgSelectedCol;
-                            //動作モードをノーマルに戻す
-                            actionMode = ActionMode.Normal;
-                            infoLabel.Text = "";
-                        }
-                    }
+                    //動作モードが親子関係設定
+                    createFiliation();
                 }
             }
 
@@ -383,9 +289,6 @@ namespace FamilyTreeMaker
 
         private void isDeadCheck_CheckedChanged(object sender, EventArgs e)
         {
-            //死亡チェックがあれば下の表示は有効
-            ageNumeric.Enabled = isDeadCheck.Checked;
-
             //対象がnullでなければ情報更新
             if (cell[selectedGen, selectedCol] != null)
             {
@@ -427,6 +330,14 @@ namespace FamilyTreeMaker
 
         private void mainPictureBox_MouseUp(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+            {
+                return;
+            }
+
+            Person tp = cell[selectedGen, selectedCol];
+            Person sp = cell[orgSelectedGen, orgSelectedCol];
+
             if (actionMode == ActionMode.Normal)
             {
                 //動作モードがノーマルの場合
@@ -445,28 +356,55 @@ namespace FamilyTreeMaker
 
                 if (e.Button == MouseButtons.Left && (selectedCol != orgSelectedCol || selectedGen != orgSelectedGen))
                 {
-                    if (cell[orgSelectedGen, orgSelectedCol] == null)
+                    if (sp == null)
                     {
                         return;
                     }
 
-                    //世代が異なっていたら移動しない
+                    //世代が異なっていたら移動しないが、親子関係が設定できるようならばする
                     if (selectedGen != orgSelectedGen)
                     {
-                        MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
-                        selectedCol = orgSelectedCol;
-                        selectedGen = orgSelectedGen;                    } 
+                        if (Math.Abs(selectedGen - orgSelectedGen) == 1)
+                        { 
+                            //親子関係が設定できるようならばする
+                            if (sp != null)
+                            {
+                                createFiliation();
+                                mainPictureBox.Refresh();
+                            }
+                            else
+                            {
+                                MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
+                                selectedCol = orgSelectedCol;
+                                selectedGen = orgSelectedGen;
+                            }
+                        } 
+                        else 
+                        {
+                            MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
+                            selectedCol = orgSelectedCol;
+                            selectedGen = orgSelectedGen;
+                        }
+                    } 
                     else if (cell[selectedGen, selectedCol] != null)
                     {
-                        //空いていなければ移動しない
-                        MessageBox.Show("移動対象セルが空ではありません", "エラー", MessageBoxButtons.OK);
-                        selectedCol = orgSelectedCol;
-                        selectedGen = orgSelectedGen;
+                        //お互いに配偶者設定されていなければ、配偶者設定できるならば行う
+                        if (!sp.getIsMarried() && !tp.getIsMarried())
+                        {
+                            createSpouse();
+                            mainPictureBox.Refresh();
+                        } else
+                        {
+                            //空いていなければ移動しない
+                            MessageBox.Show("移動対象セルが空ではありません", "エラー", MessageBoxButtons.OK);
+                            selectedCol = orgSelectedCol;
+                            selectedGen = orgSelectedGen;
+                        }
                     } 
                     else
                     {
                         //条件が整っているので移動処理
-                        cell[selectedGen, selectedCol] = cell[orgSelectedGen, orgSelectedCol];
+                        cell[selectedGen, selectedCol] = sp;
                         cell[orgSelectedGen, orgSelectedCol] = null;
                         mainPictureBox.Refresh();
                     }
@@ -482,7 +420,7 @@ namespace FamilyTreeMaker
 
         private void 婚姻関係を設定MToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //婚姻関係設定モード
+            //配偶者関係設定モード
 
             //もし選択しているセルが空だったらメッセージ表示して何もしない
             if (cell[selectedGen, selectedCol] == null)
@@ -492,8 +430,8 @@ namespace FamilyTreeMaker
             }
             else if (cell[selectedGen, selectedCol].getIsMarried())
             {
-                //既に婚姻関係が存在している人物 = エラー
-                MessageBox.Show("既に婚姻関係が設定されています", "エラー", MessageBoxButtons.OK);
+                //既に配偶者関係が存在している人物 = エラー
+                MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK);
                 return;
             }
             else
@@ -502,7 +440,7 @@ namespace FamilyTreeMaker
                 actionMode = ActionMode.SetMartial;
                 orgSelectedGen = selectedGen;
                 orgSelectedCol = selectedCol;
-                infoLabel.Text = "婚姻関係を設定中・・・";
+                infoLabel.Text = "配偶者関係を設定中・・・";
             }
         }
 
@@ -537,24 +475,16 @@ namespace FamilyTreeMaker
         {
             Person p = cell[selectedGen, selectedCol];
 
-            //もし選択しているセルが空だったらメッセージ表示して何もしない
-            if (p == null)
+            //もし選択しているセルが空か、配偶者関係がなければ何もしない
+            if (p == null || !p.getIsMarried())
             {
-                MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK);
-                return;
-            }
-
-            if (!p.getIsMarried())
-            {
-                //婚姻関係がなければエラー
-                MessageBox.Show("婚姻関係が設定されていません", "エラー", MessageBoxButtons.OK);
                 return;
             }
 
             //子供がいる場合には削除不可
             if (family.GetChildNum(p.getId()) > 0)
             {
-                MessageBox.Show("婚姻関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("配偶者関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK);
                 return;
             }
 
@@ -735,7 +665,11 @@ namespace FamilyTreeMaker
             }
         }
 
-
+        private void mainPictureBox_DoubleClick(object sender, EventArgs e)
+        {
+            //ダブルクリックで男性の人物追加
+            addPerson();
+        }
 
         //対象者の情報を表示
         private void showTargetPersonInfo(int gen, int col)
@@ -796,6 +730,169 @@ namespace FamilyTreeMaker
             {
                 c.Enabled = true;
             }
+        }
+
+        //親子関係の設定
+        private void createFiliation()
+        {
+            bool isError = false;
+
+            //親子関係設定
+            //対象のセルが空 = ノーマルモードに戻す
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                Person child, parent;
+                if (selectedGen > orgSelectedGen)
+                {
+                    //親側が先に選ばれて、子側が次に選ばれた場合
+                    child = cell[selectedGen, selectedCol];
+                    parent = cell[orgSelectedGen, orgSelectedCol];
+                }
+                else
+                {
+                    //子側が先に選ばれて、親側が次に選ばれた
+                    child = cell[orgSelectedGen, orgSelectedCol];
+                    parent = cell[selectedGen, selectedCol];
+                }
+
+                if (Math.Abs(orgSelectedGen - selectedGen) > 1 || orgSelectedGen == selectedGen)
+                {
+                    //世代が1世代の差で無いとエラー
+                    MessageBox.Show("2世代以上離れているか同世代の人物とは親子関係を設定できません", "エラー", MessageBoxButtons.OK);
+                    isError = true;
+                }
+                else if (!parent.getIsMarried())
+                {
+                    //親に配偶者がいない場合 = エラー
+                    MessageBox.Show("親世代に配偶者がいません", "エラー", MessageBoxButtons.OK);
+                    isError = true;
+                }
+                else
+                {
+                    //条件が整ったので親子関係を設定
+                    //親のIDを設定
+                    child.setParentID(parent.getId());
+                }
+
+                if (isError)
+                {
+                    //エラーの場合は共通のエラー処理
+                    selectedGen = orgSelectedGen;
+                    selectedCol = orgSelectedCol;
+                    //動作モードをノーマルに戻す
+                    actionMode = ActionMode.Normal;
+                    infoLabel.Text = "";
+                }
+            }
+        }
+
+        private void 男性に変更CMToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            changeSex(0);
+        }
+
+        private void 女性に変更WToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            changeSex(1);
+        }
+
+        //配偶者関係の設定
+        private void createSpouse()
+        {
+            bool isError = false;
+
+            //対象のセルが空 = ノーマルモードに戻す
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                Person p = cell[orgSelectedGen, orgSelectedCol];
+                Person tp = cell[selectedGen, selectedCol];
+                if (orgSelectedGen != selectedGen)
+                {
+                    //対象のセルが世代違い
+                    MessageBox.Show("世代が異なる人物間で配偶者関係は設定できません", "エラー", MessageBoxButtons.OK);
+                    isError = true;
+                }
+                else if (tp.getIsMarried())
+                {
+                    //既に配偶者関係が存在している人物 = エラー
+                    MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK);
+                    isError = true;
+                }
+                else if ((p.getSex() == 1 && tp.getSex() == 1) || (p.getSex() == 0 && tp.getSex() == 0))
+                {
+                    //どちらかが性別判別不能ではなく男性同士あるいは女性同士であれば配偶者関係は設定できない
+                    MessageBox.Show("男性同士あるいは女性同士になっています", "エラー", MessageBoxButtons.OK);
+                    isError = true;
+                }
+                else
+                {
+                    //条件が整ったので配偶者関係を設定
+                    //自分と配偶者関係相手のID
+                    int tid = cell[selectedGen, selectedCol].getId();
+                    int id = cell[orgSelectedGen, orgSelectedCol].getId();
+
+                    //配偶者関係を設定(双方向にidを設定し、isMarriedをtrueに
+                    cell[selectedGen, selectedCol].setIsMarried(true, id);
+                    cell[orgSelectedGen, orgSelectedCol].setIsMarried(true, tid);
+                }
+
+                if (isError)
+                {
+                    //エラーの場合は共通のエラー処理
+                    selectedGen = orgSelectedGen;
+                    selectedCol = orgSelectedCol;
+                    //動作モードをノーマルに戻す
+                    actionMode = ActionMode.Normal;
+                    infoLabel.Text = "";
+                }
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            //ショートカットキーの動作
+            Person p = cell[selectedGen, selectedCol];
+            if (p == null)
+            {
+                //対象セルが空ならば何もしない
+                return;
+            }
+
+            switch (e.KeyCode)
+            {
+                case Keys.S:
+                    //罹患者の入れ替え
+                    isSufferedCheck.Checked = !isSufferedCheck.Checked;
+                    break;
+                case Keys.D:
+                    //死亡かどうかの入れ替え
+                    isDeadCheck.Checked = !isDeadCheck.Checked;
+                    break;
+                case Keys.F:
+                    //女性にする
+                    femaleRadio.Checked = true;
+                    break;
+                case Keys.M:
+                    //男性にする
+                    maleRadio.Checked = true;
+                    break;
+                default:
+                    showTargetPersonInfo(selectedGen, selectedCol);
+                    break;
+            }
+        }
+
+        //性別変更
+        private void changeSex(int sex)
+        {
+            //性別変更
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                cell[selectedGen, selectedCol].setSex(sex);
+            }
+
+            showTargetPersonInfo(selectedGen, selectedCol);
+            mainPictureBox.Refresh();
         }
 
         //家系図描画メソッド
