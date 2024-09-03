@@ -25,11 +25,6 @@ namespace FamilyTreeMaker
         {
             list.Remove(person);
         }
-        public bool Contains(Person person)
-        {
-            return list.Contains(person);
-
-        }
 
         //対象のidをもつ人物を返す
         public Person GetFromId(int id)
@@ -43,11 +38,13 @@ namespace FamilyTreeMaker
         }
 
         //対象人物の子供の数を返す
-        public int GetChildNum(int id)
+        public int GetChildNum(Person p)
         {
             int ret = 0;
             //配偶者のid
-            int sid = GetFromId(id).getSpouseID();
+            int id = p.getId();
+            int sid = p.getSpouseID();
+
             if (sid == -1)
             {
                 sid = -2;

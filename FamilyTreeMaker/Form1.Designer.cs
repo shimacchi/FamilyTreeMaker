@@ -88,7 +88,6 @@
             this.mainPictureBox.Size = new System.Drawing.Size(723, 678);
             this.mainPictureBox.TabIndex = 0;
             this.mainPictureBox.TabStop = false;
-            this.mainPictureBox.Click += new System.EventHandler(this.mainPictureBox_Click);
             this.mainPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.mainPictureBox_Paint);
             this.mainPictureBox.DoubleClick += new System.EventHandler(this.mainPictureBox_DoubleClick);
             this.mainPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mainPictureBox_MouseDown);
@@ -114,12 +113,13 @@
             this.保存SToolStripMenuItem,
             this.toolStripMenuItem5});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(218, 250);
+            this.contextMenu.Size = new System.Drawing.Size(218, 278);
             // 
             // 男性に変更CMToolStripMenuItem
             // 
             this.男性に変更CMToolStripMenuItem.Name = "男性に変更CMToolStripMenuItem";
             this.男性に変更CMToolStripMenuItem.Size = new System.Drawing.Size(217, 24);
+            this.男性に変更CMToolStripMenuItem.Tag = "0";
             this.男性に変更CMToolStripMenuItem.Text = "男性に変更(&N)";
             this.男性に変更CMToolStripMenuItem.Click += new System.EventHandler(this.男性に変更CMToolStripMenuItem_Click);
             // 
@@ -127,8 +127,9 @@
             // 
             this.女性に変更WToolStripMenuItem.Name = "女性に変更WToolStripMenuItem";
             this.女性に変更WToolStripMenuItem.Size = new System.Drawing.Size(217, 24);
+            this.女性に変更WToolStripMenuItem.Tag = "1";
             this.女性に変更WToolStripMenuItem.Text = "女性に変更(&W)";
-            this.女性に変更WToolStripMenuItem.Click += new System.EventHandler(this.女性に変更WToolStripMenuItem_Click);
+            this.女性に変更WToolStripMenuItem.Click += new System.EventHandler(this.男性に変更CMToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
@@ -148,23 +149,26 @@
             // 男性を追加FToolStripMenuItem
             // 
             this.男性を追加FToolStripMenuItem.Name = "男性を追加FToolStripMenuItem";
-            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
+            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.男性を追加FToolStripMenuItem.Tag = "0";
             this.男性を追加FToolStripMenuItem.Text = "男性を追加(&M)";
             this.男性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
             // 
             // 女性を追加FToolStripMenuItem
             // 
             this.女性を追加FToolStripMenuItem.Name = "女性を追加FToolStripMenuItem";
-            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
+            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.女性を追加FToolStripMenuItem.Tag = "1";
             this.女性を追加FToolStripMenuItem.Text = "女性を追加(&F)";
-            this.女性を追加FToolStripMenuItem.Click += new System.EventHandler(this.女性を追加FToolStripMenuItem_Click);
+            this.女性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
             // 
             // 性別不明を追加UToolStripMenuItem
             // 
             this.性別不明を追加UToolStripMenuItem.Name = "性別不明を追加UToolStripMenuItem";
-            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
+            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.性別不明を追加UToolStripMenuItem.Tag = "2";
             this.性別不明を追加UToolStripMenuItem.Text = "性別不明を追加(&U)";
-            this.性別不明を追加UToolStripMenuItem.Click += new System.EventHandler(this.性別不明を追加UToolStripMenuItem_Click);
+            this.性別不明を追加UToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
             // 
             // オブジェクトの削除DToolStripMenuItem
             // 

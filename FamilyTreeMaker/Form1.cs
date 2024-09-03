@@ -18,8 +18,9 @@ namespace FamilyTreeMaker
         static readonly int MAX_GENERATION = 4;
         //列の最大数
         static readonly int MAX_COLUMN_NUMBER = 30;
-
+        //PictureBox内のパディング
         static readonly int PADDING = 20;
+        //家系図のセル内のパディング
         static int padding_famliytree;
 
         //デフォルトの列数
@@ -51,7 +52,7 @@ namespace FamilyTreeMaker
         Family family;
 
         //動作モード
-        //通常、婚姻関係設定、親子関係設定
+        //通常、配偶者関係設定、親子関係設定
         enum ActionMode 
         {
             Normal,
@@ -69,9 +70,11 @@ namespace FamilyTreeMaker
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            //セル幅の計算
             colSizeNumeric.Value  = column_number;
             cellWidth = calcCellWidth();
 
+            //初期状態として左上セルを選択状態にしておく
             selectedCol = 0;
             selectedGen = 0;
             orgSelectedCol = 0;
@@ -87,6 +90,7 @@ namespace FamilyTreeMaker
                 c.Enabled = false;
             }
 
+            //情報表示用のテキストのフォントのサイズ設定
             infoTextFontSizeNumeric.Value = infoSize;
             textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
         }
@@ -94,13 +98,15 @@ namespace FamilyTreeMaker
         private void button1_Click(object sender, EventArgs e)
         {
             //家系図をファイルに保存
-            //新しいイメージボックスにバックグラウンドで家系図作成
+            //新しいイメージにバックグラウンドで家系図作成
             Image image = new Bitmap(mainPictureBox.ClientRectangle.Width, mainPictureBox.ClientRectangle.Height);
             Graphics g = Graphics.FromImage(image);
             g.FillRectangle(Brushes.White, 0, 0, image.Width, image.Height);  
 
+           //作成した画像ファイル用のインスタンスのグラフィックコンテキストに家計図を描画
             drawFamilyGraphics(Graphics.FromImage(image));
 
+            //SaveFileDialogを使用してファイル選択
             if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
             {
                 image.Save(saveFileDialog1.FileName);
@@ -110,14 +116,15 @@ namespace FamilyTreeMaker
         private void mainPictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
             //世代別の基準となるY座標を計算
             setGenerationCenterY(e.ClipRectangle.Height);
             //セル幅計算
             int c_width = calcCellWidth();
 
-            //世代など表示
             for (int gen = 0; gen < MAX_GENERATION; gen++)
-            {
+            {            
+                //世代の文字表示
                 g.DrawString((gen + 1).ToString(), numFont, Brushes.Black, 0, gen_centerY[gen] - numFont.Height / 2);
 
                 //セル表示
@@ -137,22 +144,8 @@ namespace FamilyTreeMaker
             drawFamilyGraphics(g);
         }
 
-        private void mainPictureBox_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void setGenerationCenterY(int height)
-        {
-            for (int i = 0; i < MAX_GENERATION; i++)
-            {
-                gen_centerY[i] = height / 2 / MAX_GENERATION * (2 * i + 1);
-            }
-        }
-
          private void mainPictureBox_Resize(object sender, EventArgs e)
         {
-            cellWidth = calcCellWidth();
             mainPictureBox.Refresh();
         }
 
@@ -166,29 +159,20 @@ namespace FamilyTreeMaker
             mainPictureBox.Refresh();
         }
 
-        //セル幅の計算メソッド
-        private int calcCellWidth()
-        {
-            return (int)((float)(mainPictureBox.ClientRectangle.Width - PADDING * 3) / column_number);
-        }
-
         private void オブジェクトの削除DToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //人物の削除
             Person p = cell[selectedGen, selectedCol];
 
-            //選択セルに人物がいなければ追加
             if (p == null)
             {
-                //対象セルに人はいないのでエラー
-                MessageBox.Show("対象セルには人がいません", "エラー", MessageBoxButtons.OK);
+                //対象セルが空ならば当然何もしない
                 return;
-
             }
             else
             {
                 //婚姻関係あるいは親子関係がある場合には削除不可
-                if (family.GetChildNum(p.getId()) > 0 || p.getSpouseID() != -1)
+                if (family.GetChildNum(p) > 0 || p.getSpouseID() != -1)
                 {
                     MessageBox.Show("配偶者関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK);
                     return;
@@ -207,24 +191,11 @@ namespace FamilyTreeMaker
             }
         }
 
-        private void オブジェクトの追加AToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            addPerson();
-        }
-
         private void 男性を追加FToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            addPerson(0);
-        }
-
-        private void 女性を追加FToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            addPerson(1);
-        }
-
-        private void 性別不明を追加UToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            addPerson(2);
+            //人物追加のメニューは性別共通でTagで性を管理
+            int sex = (int)(sender as ToolStripMenuItem).Tag;
+            addPerson(sex);
         }
 
         private void mainPictureBox_MouseDown(object sender, MouseEventArgs e)
@@ -240,62 +211,46 @@ namespace FamilyTreeMaker
                 selectedCol = column_number - 1;
             }
 
-            if (e.Button == MouseButtons.Right)
-            {
-                orgSelectedGen = selectedGen;
-                orgSelectedCol = selectedCol;
-                //対象者の情報を表示
-                showTargetPersonInfo(selectedGen, selectedCol);
-            }
+            orgSelectedGen = selectedGen;
+            orgSelectedCol = selectedCol;
+            //対象者の情報を表示
+            showTargetPersonInfo(selectedGen, selectedCol);
 
             if (e.Button == MouseButtons.Left)
             {
-                //対象者の情報を表示
-                showTargetPersonInfo(selectedGen, selectedCol);
+                //動作モードがノーマル: 何もしない(選択しただけ)
+                if (actionMode == ActionMode.Normal) { }
 
-                if (actionMode == ActionMode.Normal)
-                {
-                    //動作モードがノーマルならば移動可能状態にする
-                    //ドラッグした結果移動しなかった場合のための現在の選択セルは保持
-                    orgSelectedGen = selectedGen;
-                    orgSelectedCol = selectedCol;
-                }
-
+                //動作モードが配偶者関係設定: 配偶者関係設定処理
                 if (actionMode == ActionMode.SetMartial)
                 {
-                    //動作モードが配偶者関係設定
                     createSpouse();
                 }
 
+                //動作モードが親子関係設定: 親子関係設定処理
                 if (actionMode == ActionMode.SetFiliation)
                 {
-                    //動作モードが親子関係設定
                     createFiliation();
                 }
             }
 
-            //再描画
+            //選択セルも変わっている可能性があるので再描画
             mainPictureBox.Refresh();
         }
 
         //対象者の名前を設定
         private void nameText_TextChanged(object sender, EventArgs e)
         {
-            if (cell[selectedGen, selectedCol] != null)
-            {
-                cell[selectedGen, selectedCol].setName(nameText.Text);
-            }
+            cell[selectedGen, selectedCol].setName(nameText.Text);
         }
 
         private void isDeadCheck_CheckedChanged(object sender, EventArgs e)
         {
-            //対象がnullでなければ情報更新
             if (cell[selectedGen, selectedCol] != null)
             {
                 cell[selectedGen, selectedCol].setIsDead(isDeadCheck.Checked);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
 
         private void maleRadio_CheckedChanged(object sender, EventArgs e)
@@ -303,11 +258,9 @@ namespace FamilyTreeMaker
             if (cell[selectedGen, selectedCol] != null)
             {
                 int sex = int.Parse((string)(sender as RadioButton).Tag);
-
                 cell[selectedGen, selectedCol].setSex(sex);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
 
         private void isSufferedCheck_CheckedChanged(object sender, EventArgs e)
@@ -315,16 +268,14 @@ namespace FamilyTreeMaker
             if (cell[selectedGen, selectedCol] != null)
             {
                 cell[selectedGen, selectedCol].setIsSuffered(isSufferedCheck.Checked);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
 
         private void infoTextFontSizeNumeric_ValueChanged(object sender, EventArgs e)
         {
             infoSize = (int)infoTextFontSizeNumeric.Value;
             textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
-
             mainPictureBox.Refresh();
         }
 
@@ -372,12 +323,7 @@ namespace FamilyTreeMaker
                                 createFiliation();
                                 mainPictureBox.Refresh();
                             }
-                            else
-                            {
-                                MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
-                                selectedCol = orgSelectedCol;
-                                selectedGen = orgSelectedGen;
-                            }
+
                         } 
                         else 
                         {
@@ -482,7 +428,7 @@ namespace FamilyTreeMaker
             }
 
             //子供がいる場合には削除不可
-            if (family.GetChildNum(p.getId()) > 0)
+            if (family.GetChildNum(p) > 0)
             {
                 MessageBox.Show("配偶者関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK);
                 return;
@@ -501,9 +447,8 @@ namespace FamilyTreeMaker
             if (cell[selectedGen, selectedCol] != null)
             {
                 cell[selectedGen, selectedCol].setIsProband(isProbandCheck.Checked);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
     
         private void isConsanguineousCheck_CheckedChanged(object sender, EventArgs e)
@@ -512,9 +457,8 @@ namespace FamilyTreeMaker
             if (cell[selectedGen, selectedCol] != null)
             {
                 cell[selectedGen, selectedCol].setIsConsanguineous(isConsanguineousCheck.Checked);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
 
         private void 親子関係を削除EToolStripMenuItem_Click(object sender, EventArgs e)
@@ -523,112 +467,10 @@ namespace FamilyTreeMaker
             if (cell[selectedGen, selectedCol] != null)
             {
                 cell[selectedGen, selectedCol].setParentID(-1);
+                mainPictureBox.Refresh();
             }
-
-            mainPictureBox.Refresh();
         }
 
-        private Point getTargetPoint(int gen, int col)
-        {
-            int width = calcCellWidth();
-            return new Point(PADDING * 2 + width * col, gen_centerY[gen] - width / 2);
-        }
-
-        //人物同士の関係線を引くための座標計算メソッド
-        private Point[] calcLinePointOfRelatedPersons(Person p1, Person p2, Boolean isMartial, Boolean isFiliation, Boolean isConsanguineous)
-        {
-            Point[] ret = new Point[0];
-            int margin_consanguineous;
-
-            if (isMartial)
-            {
-                //婚姻関係ならば2点計算
-                ret = new Point[2];
-
-                //p1とp2の位置で左側(colの位置)の位置を求める
-                int p1_col = 0, p2_col = 0;
-                int gen = p1.getGeneration();
-
-                for(int c = 0; c < MAX_COLUMN_NUMBER; c++)
-                {
-                    if (cell[gen, c] == p1)
-                    {
-                        p1_col = c;
-                    }
-                    if (cell[gen, c] == p2)
-                    {
-                        p2_col = c;
-                    }
-                }
-
-                //世代の基準線のy座標
-                int ry = gen_centerY[gen];
-                int rx1 = getTargetPoint(gen, Math.Min(p1_col, p2_col) + 1).X - padding_famliytree;
-                int rx2 = getTargetPoint(gen, Math.Max(p1_col, p2_col)).X + padding_famliytree;
-
-                if (isConsanguineous)
-                {
-                    margin_consanguineous = -cellWidth / 18;
-                } else
-                {
-                    margin_consanguineous = 0;
-                }
-                ret[0] = new Point(rx1, ry + margin_consanguineous);
-                ret[1] = new Point(rx2, ry + margin_consanguineous);
-            }
-            else if (isFiliation)
-            {
-                //親子関係ならば4点
-                ret = new Point[4];
-
-                //親の配偶者のインスタンス
-                //p1が子供、p2が親という前提
-                Person p3 = family.GetFromId(p2.getSpouseID());
-                int p1_col = 0, p2_col = 0, p3_col = 0;
-                int gen = p2.getGeneration();
-                int cgen = p1.getGeneration();
-
-                //親のセルの位置を同定
-                for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
-                {
-                    if (cell[gen, c] == p2)
-                    {
-                        p2_col = c;
-                    }
-                    if (cell[gen, c] == p3)
-                    {
-                        p3_col = c;
-                    }
-                }
-                //子のセルの位置を同定
-                for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
-                {
-                    if (cell[cgen, c] == p1)
-                    {
-                        p1_col = c;
-                        break;
-                    }
-                }
-
-                //親世代の関係線の中点座標
-                int ry = gen_centerY[gen];
-                int rx = (getTargetPoint(gen, Math.Min(p2_col, p3_col)).X + getTargetPoint(gen, Math.Max(p2_col, p3_col)).X) / 2 + cellWidth / 2;
-                //次に上記中点のx座標は同じで、世代間の中点のy座標の
-                int ry1 = (gen_centerY[gen] + gen_centerY[gen + 1]) / 2;
-                //次に上記の点のy座標は同じで、子のセルのx座標
-                int rx1 = getTargetPoint(cgen, p1_col).X + cellWidth / 2;
-                //最後に上記の点とx座標は同じで、子のセルのy座標
-                int ry2 = getTargetPoint(cgen, p1_col).Y + padding_famliytree;
-
-                //線の座標を設定
-                ret[0] = new Point(rx, ry);
-                ret[1] = new Point(rx, ry1);
-                ret[2] = new Point(rx1, ry1);
-                ret[3] = new Point(rx1, ry2);
-            }
-
-            return ret;
-        }
 
         private void 保存SToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -669,6 +511,40 @@ namespace FamilyTreeMaker
         {
             //ダブルクリックで男性の人物追加
             addPerson();
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            //ショートカットキーの動作
+            Person p = cell[selectedGen, selectedCol];
+            if (p == null)
+            {
+                //対象セルが空ならば何もしない
+                return;
+            }
+
+            switch (e.KeyCode)
+            {
+                case Keys.S:
+                    //罹患者の入れ替え
+                    isSufferedCheck.Checked = !isSufferedCheck.Checked;
+                    break;
+                case Keys.D:
+                    //死亡かどうかの入れ替え
+                    isDeadCheck.Checked = !isDeadCheck.Checked;
+                    break;
+                case Keys.F:
+                    //女性にする
+                    femaleRadio.Checked = true;
+                    break;
+                case Keys.M:
+                    //男性にする
+                    maleRadio.Checked = true;
+                    break;
+                default:
+                    showTargetPersonInfo(selectedGen, selectedCol);
+                    break;
+            }
         }
 
         //対象者の情報を表示
@@ -712,8 +588,6 @@ namespace FamilyTreeMaker
                 case 2:
                     //判別不能
                     unknownRadio.Checked = true;
-                    break;
-                default:
                     break;
             }
 
@@ -788,12 +662,8 @@ namespace FamilyTreeMaker
 
         private void 男性に変更CMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            changeSex(0);
-        }
-
-        private void 女性に変更WToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            changeSex(1);
+            int sex = (int)(sender as ToolStripMenuItem).Tag;
+            changeSex(sex);
         }
 
         //配偶者関係の設定
@@ -845,40 +715,6 @@ namespace FamilyTreeMaker
                     actionMode = ActionMode.Normal;
                     infoLabel.Text = "";
                 }
-            }
-        }
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            //ショートカットキーの動作
-            Person p = cell[selectedGen, selectedCol];
-            if (p == null)
-            {
-                //対象セルが空ならば何もしない
-                return;
-            }
-
-            switch (e.KeyCode)
-            {
-                case Keys.S:
-                    //罹患者の入れ替え
-                    isSufferedCheck.Checked = !isSufferedCheck.Checked;
-                    break;
-                case Keys.D:
-                    //死亡かどうかの入れ替え
-                    isDeadCheck.Checked = !isDeadCheck.Checked;
-                    break;
-                case Keys.F:
-                    //女性にする
-                    femaleRadio.Checked = true;
-                    break;
-                case Keys.M:
-                    //男性にする
-                    maleRadio.Checked = true;
-                    break;
-                default:
-                    showTargetPersonInfo(selectedGen, selectedCol);
-                    break;
             }
         }
 
@@ -1032,6 +868,124 @@ namespace FamilyTreeMaker
                     }
                 }
             }
+        }
+
+        //各世代のPictureBox内での基準位置計算
+        private void setGenerationCenterY(int height)
+        {
+            for (int i = 0; i < MAX_GENERATION; i++)
+            {
+                gen_centerY[i] = height / 2 / MAX_GENERATION * (2 * i + 1);
+            }
+        }
+
+        //セル幅の計算メソッド
+        private int calcCellWidth()
+        {
+            return (int)((float)(mainPictureBox.ClientRectangle.Width - PADDING * 3) / column_number);
+        }
+
+        //人物同士の関係線を引くための座標計算メソッド
+        private Point[] calcLinePointOfRelatedPersons(Person p1, Person p2, Boolean isMartial, Boolean isFiliation, Boolean isConsanguineous)
+        {
+            Point[] ret = new Point[0];
+            int margin_consanguineous;
+
+            if (isMartial)
+            {
+                //婚姻関係ならば2点計算
+                ret = new Point[2];
+
+                //p1とp2の位置で左側(colの位置)の位置を求める
+                int p1_col = 0, p2_col = 0;
+                int gen = p1.getGeneration();
+
+                for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
+                {
+                    if (cell[gen, c] == p1)
+                    {
+                        p1_col = c;
+                    }
+                    if (cell[gen, c] == p2)
+                    {
+                        p2_col = c;
+                    }
+                }
+
+                //世代の基準線のy座標
+                int ry = gen_centerY[gen];
+                int rx1 = getTargetPoint(gen, Math.Min(p1_col, p2_col) + 1).X - padding_famliytree;
+                int rx2 = getTargetPoint(gen, Math.Max(p1_col, p2_col)).X + padding_famliytree;
+
+                if (isConsanguineous)
+                {
+                    margin_consanguineous = -cellWidth / 18;
+                }
+                else
+                {
+                    margin_consanguineous = 0;
+                }
+                ret[0] = new Point(rx1, ry + margin_consanguineous);
+                ret[1] = new Point(rx2, ry + margin_consanguineous);
+            }
+            else if (isFiliation)
+            {
+                //親子関係ならば4点
+                ret = new Point[4];
+
+                //親の配偶者のインスタンス
+                //p1が子供、p2が親という前提
+                Person p3 = family.GetFromId(p2.getSpouseID());
+                int p1_col = 0, p2_col = 0, p3_col = 0;
+                int gen = p2.getGeneration();
+                int cgen = p1.getGeneration();
+
+                //親のセルの位置を同定
+                for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
+                {
+                    if (cell[gen, c] == p2)
+                    {
+                        p2_col = c;
+                    }
+                    if (cell[gen, c] == p3)
+                    {
+                        p3_col = c;
+                    }
+                }
+                //子のセルの位置を同定
+                for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
+                {
+                    if (cell[cgen, c] == p1)
+                    {
+                        p1_col = c;
+                        break;
+                    }
+                }
+
+                //親世代の関係線の中点座標
+                int ry = gen_centerY[gen];
+                int rx = (getTargetPoint(gen, Math.Min(p2_col, p3_col)).X + getTargetPoint(gen, Math.Max(p2_col, p3_col)).X) / 2 + cellWidth / 2;
+                //次に上記中点のx座標は同じで、世代間の中点のy座標の
+                int ry1 = (gen_centerY[gen] + gen_centerY[gen + 1]) / 2;
+                //次に上記の点のy座標は同じで、子のセルのx座標
+                int rx1 = getTargetPoint(cgen, p1_col).X + cellWidth / 2;
+                //最後に上記の点とx座標は同じで、子のセルのy座標
+                int ry2 = getTargetPoint(cgen, p1_col).Y + padding_famliytree;
+
+                //線の座標を設定
+                ret[0] = new Point(rx, ry);
+                ret[1] = new Point(rx, ry1);
+                ret[2] = new Point(rx1, ry1);
+                ret[3] = new Point(rx1, ry2);
+            }
+
+            return ret;
+        }
+
+        private Point getTargetPoint(int gen, int col)
+        {
+            int width = calcCellWidth();
+            return new Point(PADDING * 2 + width * col, gen_centerY[gen] - width / 2);
         }
     }
 }
