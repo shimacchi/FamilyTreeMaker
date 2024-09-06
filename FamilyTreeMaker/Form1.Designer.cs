@@ -68,6 +68,7 @@
             this.infoTextFontSizeNumeric = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.infoLabel = new System.Windows.Forms.Label();
+            this.aboutButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.mainPictureBox)).BeginInit();
             this.contextMenu.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -496,11 +497,24 @@
             this.infoLabel.TabIndex = 14;
             this.infoLabel.Text = "Information";
             // 
+            // aboutButton
+            // 
+            this.aboutButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.aboutButton.Location = new System.Drawing.Point(757, 634);
+            this.aboutButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.aboutButton.Name = "aboutButton";
+            this.aboutButton.Size = new System.Drawing.Size(233, 56);
+            this.aboutButton.TabIndex = 15;
+            this.aboutButton.Text = "このアプリについて";
+            this.aboutButton.UseVisualStyleBackColor = true;
+            this.aboutButton.Click += new System.EventHandler(this.aboutButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1045, 701);
+            this.Controls.Add(this.aboutButton);
             this.Controls.Add(this.infoLabel);
             this.Controls.Add(this.infoTextFontSizeNumeric);
             this.Controls.Add(this.label4);
@@ -512,7 +526,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "MainForm";
-            this.Text = "家系図作成支援ソフトウェア";
+            this.Text = "家系図作成支援";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
@@ -568,6 +582,7 @@
         private System.Windows.Forms.ToolStripMenuItem 男性に変更CMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 女性に変更WToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+        private System.Windows.Forms.Button aboutButton;
     }
 }
 

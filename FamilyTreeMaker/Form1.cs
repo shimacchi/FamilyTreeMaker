@@ -903,6 +903,12 @@ namespace FamilyTreeMaker
             } 
         }
 
+        //Aboutの表示
+        private void aboutButton_Click(object sender, EventArgs e)
+        {
+            new AboutForm().ShowDialog();
+        }
+
         //人物同士の関係線を引くための座標計算メソッド
         private Point[] calcLinePointOfRelatedPersons(Person p1, Person p2, Boolean isMartial, Boolean isFiliation, Boolean isConsanguineous)
         {
