@@ -17,7 +17,7 @@ namespace FamilyTreeMaker
         //現時点で仕様上決める最大設定可能な世代数
         static readonly int MAX_GENERATION = 4;
         //列の最大数
-        static readonly int MAX_COLUMN_NUMBER = 30;
+        static readonly int MAX_COLUMN_NUMBER = 40;
         //PictureBox内のパディング
         static readonly int PADDING = 20;
         //家系図のセル内のパディング
@@ -93,6 +93,9 @@ namespace FamilyTreeMaker
             //情報表示用のテキストのフォントのサイズ設定
             infoTextFontSizeNumeric.Value = infoSize;
             textFont = new Font(FontFamily.GenericMonospace, infoSize, FontStyle.Regular);
+
+            //最大列数の設定
+            colSizeNumeric.Maximum = MAX_COLUMN_NUMBER;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -120,7 +123,7 @@ namespace FamilyTreeMaker
             //世代別の基準となるY座標を計算
             setGenerationCenterY(e.ClipRectangle.Height);
             //セル幅計算
-            int c_width = calcCellWidth();
+            cellWidth = calcCellWidth();
 
             for (int gen = 0; gen < MAX_GENERATION; gen++)
             {            
@@ -130,14 +133,14 @@ namespace FamilyTreeMaker
                 //セル表示
                 for (int c = 0; c < column_number; c++)
                 {
-                    g.DrawRectangle(Pens.LightGray, PADDING * 2 + c_width * c, gen_centerY[gen] - c_width / 2, c_width, c_width);
+                    g.DrawRectangle(Pens.LightGray, PADDING * 2 + cellWidth * c, gen_centerY[gen] - cellWidth / 2, cellWidth, cellWidth);
                 }
             }
 
             //選択されているセルなら赤枠
             if (selectedGen > -1 && selectedCol > -1)
             {
-                g.DrawRectangle(Pens.Red, PADDING * 2 + c_width * selectedCol, gen_centerY[selectedGen] - c_width / 2, c_width, c_width);
+                g.DrawRectangle(Pens.Red, PADDING * 2 + cellWidth * selectedCol, gen_centerY[selectedGen] - cellWidth / 2, cellWidth, cellWidth);
             }
 
             //家系図を描画
@@ -194,7 +197,7 @@ namespace FamilyTreeMaker
         private void 男性を追加FToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //人物追加のメニューは性別共通でTagで性を管理
-            int sex = (int)(sender as ToolStripMenuItem).Tag;
+            int sex = int.Parse((string)(sender as ToolStripMenuItem).Tag);
             addPerson(sex);
         }
 
@@ -662,7 +665,7 @@ namespace FamilyTreeMaker
 
         private void 男性に変更CMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int sex = (int)(sender as ToolStripMenuItem).Tag;
+            int sex = int.Parse((string)(sender as ToolStripMenuItem).Tag);
             changeSex(sex);
         }
 
@@ -737,7 +740,7 @@ namespace FamilyTreeMaker
             //パディング
             padding_famliytree = cellWidth / 6;
             //図形描画サイズ(幅)
-            int ds = calcCellWidth() - padding_famliytree * 2;
+            int ds = cellWidth - padding_famliytree * 2;
 
             for (int gen = 0; gen < MAX_GENERATION; gen++)
             {
@@ -810,7 +813,7 @@ namespace FamilyTreeMaker
                         if (p.getIsDead())
                         {
                             //死亡していれば斜め線追加
-                            g.DrawLine(Pens.Black, xx, y, x, y + calcCellWidth());
+                            g.DrawLine(Pens.Black, xx, y, x, y + cellWidth);
                         }
 
                         //年齢表示
@@ -984,8 +987,7 @@ namespace FamilyTreeMaker
 
         private Point getTargetPoint(int gen, int col)
         {
-            int width = calcCellWidth();
-            return new Point(PADDING * 2 + width * col, gen_centerY[gen] - width / 2);
+            return new Point(PADDING * 2 + cellWidth * col, gen_centerY[gen] - cellWidth / 2);
         }
     }
 }

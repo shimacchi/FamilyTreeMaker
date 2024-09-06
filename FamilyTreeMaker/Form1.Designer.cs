@@ -113,7 +113,7 @@
             this.保存SToolStripMenuItem,
             this.toolStripMenuItem5});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(218, 278);
+            this.contextMenu.Size = new System.Drawing.Size(218, 250);
             // 
             // 男性に変更CMToolStripMenuItem
             // 
@@ -149,7 +149,7 @@
             // 男性を追加FToolStripMenuItem
             // 
             this.男性を追加FToolStripMenuItem.Name = "男性を追加FToolStripMenuItem";
-            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
             this.男性を追加FToolStripMenuItem.Tag = "0";
             this.男性を追加FToolStripMenuItem.Text = "男性を追加(&M)";
             this.男性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -157,7 +157,7 @@
             // 女性を追加FToolStripMenuItem
             // 
             this.女性を追加FToolStripMenuItem.Name = "女性を追加FToolStripMenuItem";
-            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
             this.女性を追加FToolStripMenuItem.Tag = "1";
             this.女性を追加FToolStripMenuItem.Text = "女性を追加(&F)";
             this.女性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -165,7 +165,7 @@
             // 性別不明を追加UToolStripMenuItem
             // 
             this.性別不明を追加UToolStripMenuItem.Name = "性別不明を追加UToolStripMenuItem";
-            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
             this.性別不明を追加UToolStripMenuItem.Tag = "2";
             this.性別不明を追加UToolStripMenuItem.Text = "性別不明を追加(&U)";
             this.性別不明を追加UToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -384,7 +384,7 @@
             // isDeadCheck
             // 
             this.isDeadCheck.AutoSize = true;
-            this.isDeadCheck.Location = new System.Drawing.Point(128, 128);
+            this.isDeadCheck.Location = new System.Drawing.Point(128, 102);
             this.isDeadCheck.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.isDeadCheck.Name = "isDeadCheck";
             this.isDeadCheck.Size = new System.Drawing.Size(59, 19);
@@ -396,7 +396,7 @@
             // isProbandCheck
             // 
             this.isProbandCheck.AutoSize = true;
-            this.isProbandCheck.Location = new System.Drawing.Point(128, 102);
+            this.isProbandCheck.Location = new System.Drawing.Point(128, 171);
             this.isProbandCheck.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.isProbandCheck.Name = "isProbandCheck";
             this.isProbandCheck.Size = new System.Drawing.Size(74, 19);
@@ -491,7 +491,7 @@
             this.infoLabel.ForeColor = System.Drawing.Color.Red;
             this.infoLabel.Location = new System.Drawing.Point(757, 361);
             this.infoLabel.Name = "infoLabel";
-            this.infoLabel.Size = new System.Drawing.Size(91, 18);
+            this.infoLabel.Size = new System.Drawing.Size(101, 19);
             this.infoLabel.TabIndex = 14;
             this.infoLabel.Text = "Information";
             // 
