@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.mainPictureBox = new System.Windows.Forms.PictureBox();
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.男性に変更CMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -149,7 +150,7 @@
             // 男性を追加FToolStripMenuItem
             // 
             this.男性を追加FToolStripMenuItem.Name = "男性を追加FToolStripMenuItem";
-            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
+            this.男性を追加FToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
             this.男性を追加FToolStripMenuItem.Tag = "0";
             this.男性を追加FToolStripMenuItem.Text = "男性を追加(&M)";
             this.男性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -157,7 +158,7 @@
             // 女性を追加FToolStripMenuItem
             // 
             this.女性を追加FToolStripMenuItem.Name = "女性を追加FToolStripMenuItem";
-            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
+            this.女性を追加FToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
             this.女性を追加FToolStripMenuItem.Tag = "1";
             this.女性を追加FToolStripMenuItem.Text = "女性を追加(&F)";
             this.女性を追加FToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -165,7 +166,7 @@
             // 性別不明を追加UToolStripMenuItem
             // 
             this.性別不明を追加UToolStripMenuItem.Name = "性別不明を追加UToolStripMenuItem";
-            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(199, 24);
+            this.性別不明を追加UToolStripMenuItem.Size = new System.Drawing.Size(213, 26);
             this.性別不明を追加UToolStripMenuItem.Tag = "2";
             this.性別不明を追加UToolStripMenuItem.Text = "性別不明を追加(&U)";
             this.性別不明を追加UToolStripMenuItem.Click += new System.EventHandler(this.男性を追加FToolStripMenuItem_Click);
@@ -491,7 +492,7 @@
             this.infoLabel.ForeColor = System.Drawing.Color.Red;
             this.infoLabel.Location = new System.Drawing.Point(757, 361);
             this.infoLabel.Name = "infoLabel";
-            this.infoLabel.Size = new System.Drawing.Size(101, 19);
+            this.infoLabel.Size = new System.Drawing.Size(91, 18);
             this.infoLabel.TabIndex = 14;
             this.infoLabel.Text = "Information";
             // 
@@ -508,9 +509,11 @@
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.ImageSaveButton);
             this.Controls.Add(this.mainPictureBox);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "MainForm";
             this.Text = "家系図作成支援ソフトウェア";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.mainPictureBox)).EndInit();

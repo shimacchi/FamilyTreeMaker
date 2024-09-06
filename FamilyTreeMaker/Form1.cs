@@ -177,7 +177,7 @@ namespace FamilyTreeMaker
                 //婚姻関係あるいは親子関係がある場合には削除不可
                 if (family.GetChildNum(p) > 0 || p.getSpouseID() != -1)
                 {
-                    MessageBox.Show("配偶者関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("配偶者関係あるいは子が存在する場合削除できません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
 
                 }
@@ -335,7 +335,7 @@ namespace FamilyTreeMaker
                         } 
                         else 
                         {
-                            MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK);
+                            MessageBox.Show("世代が異なる移動はできません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             selectedCol = orgSelectedCol;
                             selectedGen = orgSelectedGen;
                         }
@@ -350,7 +350,7 @@ namespace FamilyTreeMaker
                         } else
                         {
                             //空いていなければ移動しない
-                            MessageBox.Show("移動対象セルが空ではありません", "エラー", MessageBoxButtons.OK);
+                            MessageBox.Show("移動対象セルが空ではありません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             selectedCol = orgSelectedCol;
                             selectedGen = orgSelectedGen;
                         }
@@ -379,13 +379,13 @@ namespace FamilyTreeMaker
             //もし選択しているセルが空だったらメッセージ表示して何もしない
             if (cell[selectedGen, selectedCol] == null)
             {
-                MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             else if (cell[selectedGen, selectedCol].getIsMarried())
             {
                 //既に配偶者関係が存在している人物 = エラー
-                MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             else
@@ -414,7 +414,7 @@ namespace FamilyTreeMaker
             //もし選択しているセルが空だったらメッセージ表示して何もしない
             if (cell[selectedGen, selectedCol] == null)
             {
-                MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("選択したセルは空です", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -438,7 +438,7 @@ namespace FamilyTreeMaker
             //子供がいる場合には削除不可
             if (family.GetChildNum(p) > 0)
             {
-                MessageBox.Show("配偶者関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("配偶者関係を削除する前に全ての親子関係を削除してください", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -491,7 +491,7 @@ namespace FamilyTreeMaker
             //選択していなければ通知
             if (selectedGen < 0 || selectedCol < 0)
             {
-                MessageBox.Show("対象セルを選んでください", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("対象セルを選んでください", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -511,7 +511,7 @@ namespace FamilyTreeMaker
             }
             else
             {
-                MessageBox.Show("対象セルには既に人がいます", "エラー", MessageBoxButtons.OK);
+                MessageBox.Show("対象セルには既に人がいます", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -640,13 +640,13 @@ namespace FamilyTreeMaker
                 if (Math.Abs(orgSelectedGen - selectedGen) > 1 || orgSelectedGen == selectedGen)
                 {
                     //世代が1世代の差で無いとエラー
-                    MessageBox.Show("2世代以上離れているか同世代の人物とは親子関係を設定できません", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("2世代以上離れているか同世代の人物とは親子関係を設定できません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isError = true;
                 }
                 else if (!parent.getIsMarried())
                 {
                     //親に配偶者がいない場合 = エラー
-                    MessageBox.Show("親世代に配偶者がいません", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("親世代に配偶者がいません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isError = true;
                 }
                 else
@@ -687,19 +687,19 @@ namespace FamilyTreeMaker
                 if (orgSelectedGen != selectedGen)
                 {
                     //対象のセルが世代違い
-                    MessageBox.Show("世代が異なる人物間で配偶者関係は設定できません", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("世代が異なる人物間で配偶者関係は設定できません", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isError = true;
                 }
                 else if (tp.getIsMarried())
                 {
                     //既に配偶者関係が存在している人物 = エラー
-                    MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("既に配偶者関係が設定されています", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isError = true;
                 }
                 else if ((p.getSex() == 1 && tp.getSex() == 1) || (p.getSex() == 0 && tp.getSex() == 0))
                 {
                     //どちらかが性別判別不能ではなく男性同士あるいは女性同士であれば配偶者関係は設定できない
-                    MessageBox.Show("男性同士あるいは女性同士になっています", "エラー", MessageBoxButtons.OK);
+                    MessageBox.Show("男性同士あるいは女性同士になっています", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     isError = true;
                 }
                 else
@@ -891,6 +891,16 @@ namespace FamilyTreeMaker
         private int calcCellWidth()
         {
             return (int)((float)(mainPictureBox.ClientRectangle.Width - PADDING * 3) / column_number);
+        }
+
+        //フォーム閉じる前に一応確認
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show("終了してよいですか？", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
+            {
+                //Noなので終了阻止
+                e.Cancel = true;
+            } 
         }
 
         //人物同士の関係線を引くための座標計算メソッド
