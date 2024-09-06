@@ -214,8 +214,13 @@ namespace FamilyTreeMaker
                 selectedCol = column_number - 1;
             }
 
-            orgSelectedGen = selectedGen;
-            orgSelectedCol = selectedCol;
+            //動作モードがノーマルの時にのみ選択したセルを保存
+            if (actionMode == ActionMode.Normal)
+            {
+                orgSelectedGen = selectedGen;
+                orgSelectedCol = selectedCol;
+            }
+
             //対象者の情報を表示
             showTargetPersonInfo(selectedGen, selectedCol);
 
