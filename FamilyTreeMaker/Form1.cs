@@ -743,7 +743,7 @@ namespace FamilyTreeMaker
         private void drawFamilyGraphics(Graphics g)
         {
             //パディング
-            padding_famliytree = cellWidth / 6;
+            padding_famliytree = cellWidth / 10;
             //図形描画サイズ(幅)
             int ds = cellWidth - padding_famliytree * 2;
 
@@ -826,11 +826,11 @@ namespace FamilyTreeMaker
                         {
                             if (p.getIsDead())
                             {
-                                g.DrawString(String.Format("d.{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree / 3, y + cellWidth);
+                                g.DrawString(String.Format("d.{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree, y + cellWidth);
                             }
                             else
                             {
-                                g.DrawString(String.Format("{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree / 2, y + cellWidth);
+                                g.DrawString(String.Format("{0}y", p.getAge()), textFont, Brushes.Black, x + padding_famliytree, y + cellWidth);
                             }
                         }
 
@@ -914,16 +914,15 @@ namespace FamilyTreeMaker
         {
             Point[] ret = new Point[0];
             int margin_consanguineous;
+            int left, right;
+            bool isAnotherPerson = false;
 
             if (isMartial)
             {
-                //婚姻関係ならば2点計算
-                ret = new Point[2];
-
                 //p1とp2の位置で左側(colの位置)の位置を求める
                 int p1_col = 0, p2_col = 0;
                 int gen = p1.getGeneration();
-
+                
                 for (int c = 0; c < MAX_COLUMN_NUMBER; c++)
                 {
                     if (cell[gen, c] == p1)
@@ -935,22 +934,74 @@ namespace FamilyTreeMaker
                         p2_col = c;
                     }
                 }
+                //p1-p2間に誰か人がいないかどうか
+                left = Math.Min(p1_col, p2_col);
+                right = Math.Max(p1_col, p2_col);
 
-                //世代の基準線のy座標
-                int ry = gen_centerY[gen];
-                int rx1 = getTargetPoint(gen, Math.Min(p1_col, p2_col) + 1).X - padding_famliytree;
-                int rx2 = getTargetPoint(gen, Math.Max(p1_col, p2_col)).X + padding_famliytree;
-
-                if (isConsanguineous)
+                for(int c = left + 1; c < right; c++)
                 {
-                    margin_consanguineous = -cellWidth / 18;
+                    if (cell[gen, c] != null)
+                    {
+                        isAnotherPerson = true;
+                        break;
+                    }
                 }
+
+                //間に人がいなければ通常の線、人がいれば下側に一度線を引いて配偶者線
+                if (isAnotherPerson)
+                {
+                    //間に人がいる
+
+                    //4点を決めて線を引く
+                    ret = new Point[4];
+
+                    int ry1 = getTargetPoint(gen, left).Y + cellWidth;
+                    int ry2 = gen_centerY[gen] + (gen_centerY[gen + 1] - gen_centerY[gen]) / 4;
+                    int rx1 = getTargetPoint(gen, left).X + cellWidth / 2;
+                    int rx2 = getTargetPoint(gen, right).X + cellWidth / 2;
+
+                    //近親婚の場合
+                    if (isConsanguineous)
+                    {
+                        margin_consanguineous = -cellWidth / 16;
+                    }
+                    else
+                    {
+                        margin_consanguineous = 0;
+                    }
+
+                    //線を引く座標
+                    ret[0] = new Point(rx1, ry1 - padding_famliytree);
+                    ret[1] = new Point(rx1, ry2 + margin_consanguineous);
+                    ret[2] = new Point(rx2, ry2 + margin_consanguineous);
+                    ret[3] = new Point(rx2, ry1 - padding_famliytree);
+                } 
                 else
                 {
-                    margin_consanguineous = 0;
+                    //間に人がいない
+
+                    //2点を決めて線を引く
+                    ret = new Point[2];
+
+                    //世代の基準線のy座標
+                    int ry = gen_centerY[gen];
+                    int rx1 = getTargetPoint(gen, left + 1).X - padding_famliytree;
+                    int rx2 = getTargetPoint(gen, right).X + padding_famliytree;
+
+                    //近親婚の場合
+                    if (isConsanguineous)
+                    {
+                        margin_consanguineous = -cellWidth / 16;
+                    }
+                    else
+                    {
+                        margin_consanguineous = 0;
+                    }
+
+                    //線を引く座標
+                    ret[0] = new Point(rx1, ry + margin_consanguineous);
+                    ret[1] = new Point(rx2, ry + margin_consanguineous);
                 }
-                ret[0] = new Point(rx1, ry + margin_consanguineous);
-                ret[1] = new Point(rx2, ry + margin_consanguineous);
             }
             else if (isFiliation)
             {
@@ -986,10 +1037,39 @@ namespace FamilyTreeMaker
                     }
                 }
 
+                //p2-p3間に誰か人がいないかどうか
+                left = Math.Min(p2_col, p3_col);
+                right = Math.Max(p2_col, p3_col);
+
+                for (int c = left + 1; c < right; c++)
+                {
+                    if (cell[gen, c] != null)
+                    {
+                        isAnotherPerson = true;
+                        break;
+                    }
+                }
+
+                int another_person_margin = 0;
+                if (isAnotherPerson)
+                {
+                    //配偶者関係の間に他人がいた場合、関係線は下側から出ているので位置を調整
+                    another_person_margin = (gen_centerY[gen + 1] - gen_centerY[gen]) / 4;
+                }
+
                 //親世代の関係線の中点座標
-                int ry = gen_centerY[gen];
-                int rx = (getTargetPoint(gen, Math.Min(p2_col, p3_col)).X + getTargetPoint(gen, Math.Max(p2_col, p3_col)).X) / 2 + cellWidth / 2;
-                //次に上記中点のx座標は同じで、世代間の中点のy座標の
+                int ry;
+                if (isAnotherPerson)
+                {
+                    ry = gen_centerY[gen] + (gen_centerY[gen + 1] - gen_centerY[gen]) / 4;
+                } 
+                else
+                {
+                    ry = gen_centerY[gen];
+                }
+
+                int rx = (getTargetPoint(gen, left).X + getTargetPoint(gen, right).X) / 2 + cellWidth / 2;
+                //次に上記中点のx座標は同じで、世代間の中点のy座標の座標
                 int ry1 = (gen_centerY[gen] + gen_centerY[gen + 1]) / 2;
                 //次に上記の点のy座標は同じで、子のセルのx座標
                 int rx1 = getTargetPoint(cgen, p1_col).X + cellWidth / 2;

@@ -34,7 +34,7 @@ namespace FamilyTreeMaker
         Boolean isMarried;
         //近親婚か否か
         Boolean isConsanguineous;
-
+ 
         //世代
         int generation;
 
