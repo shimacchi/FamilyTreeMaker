@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <body style="padding: 2ex;">
     <h1>家系図作成支援ソフトウェアの簡単な取扱説明</h1>
     <hr />
