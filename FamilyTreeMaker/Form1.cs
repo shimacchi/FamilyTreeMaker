@@ -31,7 +31,7 @@ namespace FamilyTreeMaker
         //人物を表す記号のフォントサイズ(px) = セルの幅でもある
         static int cellWidth;
         //情報(死亡時年齢や発端者など)のフォントサイズ(pt)
-        int infoSize = 10;
+        int infoSize = 14;
 
         //世代ごとのPicureBoxのなかでの基準位置
         static readonly int[] gen_centerY = new int[MAX_GENERATION];
@@ -39,7 +39,7 @@ namespace FamilyTreeMaker
         //情報表示用の文字フォント
         Font textFont;
         //世代表示の文字用フォント
-        static readonly Font numFont = new Font(FontFamily.GenericMonospace, 20, FontStyle.Regular);
+        static readonly Font numFont = new Font(FontFamily.GenericMonospace, 14, FontStyle.Regular);
 
         //人物情報を格納するためのセル
         Person [,] cell = new Person[MAX_GENERATION, MAX_COLUMN_NUMBER];
@@ -837,12 +837,12 @@ namespace FamilyTreeMaker
                         if (p.getIsProband())
                         {
                             //発端者ならばP↑追加
-                            g.DrawString("P", textFont, Brushes.Black, x - padding_famliytree * 3, y + cellWidth + padding_famliytree);
+                            g.DrawString("P", textFont, Brushes.Black, x - (int)((float)cellWidth / 2), y + cellWidth + cellWidth / 4);
                             //↑のポイント作成
-                            int al = padding_famliytree / 2;
-                            int tx = x - padding_famliytree / 3;
-                            int ty = y + cellWidth + padding_famliytree / 3;
-                            g.DrawLine(Pens.Black, x - padding_famliytree, y + cellWidth + padding_famliytree, tx, ty);
+                            int al = cellWidth / 7;
+                            int tx = x;
+                            int ty = y + padding_famliytree + cellWidth;
+                            g.DrawLine(Pens.Black, tx - 1.2f * al, ty +  1.2f * al, tx, ty);
                             g.DrawLine(Pens.Black, tx - al, ty, tx, ty);
                             g.DrawLine(Pens.Black, tx, ty + al, tx, ty);
                         }

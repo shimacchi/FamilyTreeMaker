@@ -21,5 +21,10 @@ namespace FamilyTreeMaker
         {
             this.Close();
         }
+
+        private void AboutForm_Load(object sender, EventArgs e)
+        {
+            varLabel.Text = "Version: " + Application.ProductVersion.ToString();
+        }
     }
 }
