@@ -100,7 +100,7 @@ Privacy Policy
 * This application and developer do not collect any information on keyboard typing by the user.
 * This application does not access any files or folders to work except OS automatically does.
 * This is a stand-alone application and does not need any Internet access.
-* 
+
 * このアプリケーションはいかなる種類の個人情報も収集しません
 * このアプリケーションは動作中のいかなるキーボード操作も記録・収集しません
 * このアプリケーションは動作に際して、OSが自動的に行う以外のいかなるファイル/フォルダへのアクセスもありません
