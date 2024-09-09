@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <body style="padding: 2ex;">
     <h1>家系図作成支援ソフトウェアの簡単な取扱説明</h1>
     <hr />
@@ -93,18 +92,20 @@
     <hr />
 
   <h2 id="rest">プライバシーポリシー</h2>
-    <p>
+<p>
 Privacy Policy
-
-* This application and developer do not collect any personal information or privacy-related information at all.
-* This application and developer do not collect any information on keyboard typing by the user.
-* This application does not access any files or folders to work except OS automatically does.
-* This is a stand-alone application and does not need any Internet access.
-
-* このアプリケーションはいかなる種類の個人情報も収集しません
-* このアプリケーションは動作中のいかなるキーボード操作も記録・収集しません
-* このアプリケーションは動作に際して、OSが自動的に行う以外のいかなるファイル/フォルダへのアクセスもありません
-* このアプリケーションは単独で動作し、動作に際してインターネット接続は必要ありません
-    </p>
+<ol>
+    <li>This application and developer do not collect any personal information or privacy-related information at all.</li>
+    <li>This application and developer do not collect any information on keyboard typing by the user.</li>
+    <li>This application does not access any files or folders to work except OS automatically does.</li>
+    <li>This is a stand-alone application and does not need any Internet access.</li>
+</ol>
+<ol>
+    <li>このアプリケーションはいかなる種類の個人情報も収集しません</li>
+    <li>このアプリケーションは動作中のいかなるキーボード操作も記録・収集しません</li>
+    <li>このアプリケーションは動作に際して、OSが自動的に行う以外のいかなるファイル/フォルダへのアクセスもありません</li>
+    <li>このアプリケーションは単独で動作し、動作に際してインターネット接続は必要ありません</li>
+</ol>
+</p>
 
 </body>
