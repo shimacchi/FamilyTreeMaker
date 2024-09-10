@@ -468,7 +468,7 @@
             this.infoTextFontSizeNumeric.Size = new System.Drawing.Size(85, 22);
             this.infoTextFontSizeNumeric.TabIndex = 12;
             this.infoTextFontSizeNumeric.Value = new decimal(new int[] {
-            10,
+            14,
             0,
             0,
             0});

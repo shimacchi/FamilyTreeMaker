@@ -31,6 +31,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.varLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -47,11 +48,11 @@
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(12, 203);
+            this.label2.Location = new System.Drawing.Point(12, 228);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(358, 59);
+            this.label2.Size = new System.Drawing.Size(358, 34);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Ver 1.1.2\r\nCopyright(C) 2024\r\ne-mail: shimacchi8282@gmail.com";
+            this.label2.Text = "Copyright(C) 2024\r\ne-mail: shimacchi8282@gmail.com";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // button1
@@ -64,12 +65,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // varLabel
+            // 
+            this.varLabel.Location = new System.Drawing.Point(12, 188);
+            this.varLabel.Name = "varLabel";
+            this.varLabel.Size = new System.Drawing.Size(358, 40);
+            this.varLabel.TabIndex = 3;
+            this.varLabel.Text = "version";
+            this.varLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // AboutForm
             // 
             this.AcceptButton = this.button1;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(382, 353);
+            this.Controls.Add(this.varLabel);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -78,6 +89,7 @@
             this.MinimizeBox = false;
             this.Name = "AboutForm";
             this.Text = "このソフトウェアについて";
+            this.Load += new System.EventHandler(this.AboutForm_Load);
             this.ResumeLayout(false);
 
         }
@@ -87,5 +99,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label varLabel;
     }
 }

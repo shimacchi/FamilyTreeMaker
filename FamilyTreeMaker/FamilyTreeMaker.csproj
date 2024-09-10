@@ -124,7 +124,6 @@
   <ItemGroup>
     <Content Include="fmt.ico" />
     <Content Include="readme2.html" />
-    <Content Include="readme.html" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
