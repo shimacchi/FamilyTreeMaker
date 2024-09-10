@@ -249,7 +249,10 @@ namespace FamilyTreeMaker
         //対象者の名前を設定
         private void nameText_TextChanged(object sender, EventArgs e)
         {
-            cell[selectedGen, selectedCol].setName(nameText.Text);
+            if (cell[selectedGen, selectedCol] != null)
+            {
+                cell[selectedGen, selectedCol].setName(nameText.Text);
+            }
         }
 
         private void isDeadCheck_CheckedChanged(object sender, EventArgs e)
@@ -525,7 +528,7 @@ namespace FamilyTreeMaker
         {
             //ショートカットキーの動作
             Person p = cell[selectedGen, selectedCol];
-            if (p == null)
+            if (p == null || nameText.Focused)
             {
                 //対象セルが空ならば何もしない
                 return;
