@@ -9,7 +9,7 @@
   <Identity
     Name="Shimacchi.5632480D755F"
     Publisher="CN=116FE0BD-CB1C-4538-95A5-57378F47EB9B"
-    Version="1.2.0.0" />
+    Version="1.2.1.0" />
 
   <Properties>
     <DisplayName>医療用家系図作成</DisplayName>
