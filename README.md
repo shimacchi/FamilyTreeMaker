@@ -16,7 +16,6 @@
         <li><a href="#relation">人物間の関係</a></li>
         <li><a href="#save">家系図の保存</a></li>
         <li><a href="#rest">制限事項</a></li>
-        <li><a href="#end">おわりに</a></li>
     </ol>
 
   <h2 id="spec">主要な仕様</h2>
@@ -91,7 +90,7 @@
     </p>
     <hr />
 
-  <h2 id="rest">プライバシーポリシー</h2>
+  <h2 id="pp">プライバシーポリシー</h2>
 <p>
 Privacy Policy
 <ol>
